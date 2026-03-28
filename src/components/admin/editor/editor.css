@@ -1,0 +1,232 @@
+/* Editor-only overrides — typography comes from .blog-prose in globals.css */
+
+.prose-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--color-zinc-400);
+  pointer-events: none;
+  height: 0;
+}
+
+/* Default styles for editor blocks — inside @layer components so Tailwind
+   utilities (@layer utilities) can override them via cascade layer priority */
+@layer components {
+  .prose-editor [data-type="columns"] {
+    display: grid;
+    gap: 1rem;
+    border: 1px solid transparent;
+    padding: 0.25rem;
+    transition: border-color 0.15s ease;
+  }
+
+  .prose-editor [data-type="columns"][data-count="1"] {
+    grid-template-columns: 1fr;
+  }
+
+  .prose-editor [data-type="columns"][data-count="2"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .prose-editor [data-type="columns"][data-count="3"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .prose-editor [data-type="columns"][data-count="4"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .prose-editor [data-type="columns"][data-count="5"] {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .prose-editor [data-type="columns"][data-count="6"] {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .prose-editor [data-type="column"] {
+    min-height: 2rem;
+    border: 1px solid transparent;
+    transition: border-color 0.15s ease;
+  }
+
+  .prose-editor [data-type="styled-block"] {
+    min-height: 2rem;
+    border: 1px solid transparent;
+    position: relative;
+    transition: border-color 0.15s ease;
+  }
+
+  /* Width breakout classes.
+     Direct child: styledBlock / columns put .wide/.full on themselves.
+     :has(> .wide): ReactNodeViewRenderer wraps NodeViewWrapper in an extra
+     <div>, so we bubble up from the inner figure to the outer wrapper. */
+  .blog-prose > .wide,
+  .blog-prose > :has(> .wide) {
+    max-width: var(--container-4xl);
+    margin-inline: auto;
+  }
+
+  .blog-prose > .full,
+  .blog-prose > :has(> .full) {
+    max-width: none;
+  }
+}
+
+/* Hover indicators — disabled until selection outlines are stable
+.prose-editor [data-type="columns"]:hover,
+.prose-editor [data-type="styled-block"]:hover {
+  border-color: var(--color-zinc-300);
+}
+.prose-editor [data-type="columns"]:hover > [data-type="column"] {
+  border-color: var(--color-zinc-300);
+}
+.dark .prose-editor [data-type="columns"]:hover,
+.dark .prose-editor [data-type="styled-block"]:hover {
+  border-color: var(--color-zinc-700);
+}
+.dark .prose-editor [data-type="columns"]:hover > [data-type="column"] {
+  border-color: var(--color-zinc-700);
+} */
+
+.prose-editor [data-type="styled-block"]::before {
+  content: "styled block";
+  position: absolute;
+  top: -0.5rem;
+  left: 0.5rem;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-zinc-300);
+  background: var(--color-zinc-50, white);
+  padding: 0 0.25rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.prose-editor [data-type="styled-block"]:hover::before {
+  opacity: 1;
+}
+
+.dark .prose-editor [data-type="styled-block"]::before {
+  color: var(--color-zinc-700);
+  background: var(--color-zinc-925);
+}
+
+/* Active (selected) wrapper indicator — unified double-ring style
+   Matches image selection outline exactly: rounded corners, no extra borders */
+.prose-editor [data-active] {
+  outline: none;
+  border-color: transparent !important;
+  box-shadow: 0 0 0 1.5px white, 0 0 0 3px var(--color-zinc-900);
+}
+
+.dark .prose-editor [data-active] {
+  box-shadow: 0 0 0 1.5px var(--color-zinc-900), 0 0 0 3px var(--color-zinc-100);
+}
+
+/* For images, apply the ring on <img> so it follows border-radius */
+.prose-editor figure[data-active],
+.dark .prose-editor figure[data-active] {
+  box-shadow: none;
+}
+
+.prose-editor figure[data-active] > img {
+  box-shadow: 0 0 0 1.5px white, 0 0 0 3px var(--color-zinc-900);
+}
+
+.dark .prose-editor figure[data-active] > img {
+  box-shadow: 0 0 0 1.5px var(--color-zinc-900), 0 0 0 3px var(--color-zinc-100);
+}
+
+/* For video nodes (ReactNodeViewRenderer), data-active lands on Tiptap's
+   outer wrapper div — NOT on our <figure data-type="video">.
+   Use :has() to strip the generic ring from that wrapper and re-apply it
+   on .video-player so it follows its border-radius. */
+.prose-editor [data-active]:has([data-type="video"]) {
+  box-shadow: none;
+}
+
+.dark .prose-editor [data-active]:has([data-type="video"]) {
+  box-shadow: none;
+}
+
+.prose-editor [data-active] [data-type="video"] .video-player {
+  box-shadow: 0 0 0 1.5px white, 0 0 0 3px var(--color-zinc-900);
+}
+
+.dark .prose-editor [data-active] [data-type="video"] .video-player {
+  box-shadow: 0 0 0 1.5px var(--color-zinc-900), 0 0 0 3px var(--color-zinc-100);
+}
+
+/* For logo-divider nodes (ReactNodeViewRenderer), same wrapper issue as video.
+   Strip ring from wrapper, re-apply on inner div so it follows any user border-radius. */
+.prose-editor [data-active]:has([data-type="logo-divider"]) {
+  box-shadow: none;
+}
+
+.dark .prose-editor [data-active]:has([data-type="logo-divider"]) {
+  box-shadow: none;
+}
+
+.prose-editor [data-active] [data-type="logo-divider"] > div {
+  box-shadow: 0 0 0 1.5px white, 0 0 0 3px var(--color-zinc-900);
+}
+
+.dark .prose-editor [data-active] [data-type="logo-divider"] > div {
+  box-shadow: 0 0 0 1.5px var(--color-zinc-900), 0 0 0 3px var(--color-zinc-100);
+}
+
+.prose-editor [data-active]::before {
+  opacity: 1;
+}
+
+/* Selection mode — arrow cursor + hide caret when a container is selected */
+.prose-editor[data-selecting] {
+  caret-color: transparent;
+  cursor: default;
+}
+
+.prose-editor[data-selecting] * {
+  cursor: default;
+}
+
+/* ─── Drag Handle ─── */
+.drag-handle {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: grab;
+  color: var(--color-zinc-400);
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.drag-handle:hover {
+  background-color: var(--color-zinc-100);
+  color: var(--color-zinc-600);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.dark .drag-handle {
+  color: var(--color-zinc-600);
+}
+
+.dark .drag-handle:hover {
+  background-color: var(--color-zinc-800);
+  color: var(--color-zinc-400);
+}
+
+.dark .drag-handle:active {
+  background-color: var(--color-zinc-700);
+}
+
+/* ─── Dropcursor ─── */
+.ProseMirror-dropcursor {
+  border-color: var(--color-blue-500) !important;
+  border-width: 2px !important;
+}

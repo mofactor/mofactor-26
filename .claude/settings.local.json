@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:art.pkh.me)",
+      "Bash(npx --yes sharp-cli:*)",
+      "Bash(python3:*)",
+      "Bash(npm install:*)",
+      "Bash(node -e:*)",
+      "WebFetch(domain:www.vengenceui.com)",
+      "WebFetch(domain:animejs.com)",
+      "Bash(ipconfig getifaddr en0)",
+      "WebFetch(domain:tiptap.dev)",
+      "Bash(grep -r \"container\" node_modules/.css-*)",
+      "Bash(npx tailwindcss --help)",
+      "Bash(npx @tailwindcss/cli --input src/app/globals.css)",
+      "Bash(git diff src/app/\\\\\\(convex\\\\\\)/blog/[slug]/page.tsx src/app/\\\\\\(convex\\\\\\)/layout.tsx src/components/cms/TiptapRenderer.tsx src/components/cms/renderers/ColumnsRenderer.tsx src/components/cms/renderers/StyledBlockRenderer.tsx src/lib/utils.ts package.json)",
+      "WebFetch(domain:www.untitledui.com)",
+      "Bash(grep -n \"scrollToSelection\\\\|scrolledIntoView\" \"/Users/onuroztaskiran/FE Apps/tt6/mftr-26/node_modules/prosemirror-state/src\"/*)",
+      "WebFetch(domain:prosemirror.net)",
+      "Bash(curl -sL \"https://raw.githubusercontent.com/shadcn-ui/ui/refs/heads/main/apps/v4/registry/new-york-v4/ui/button-group.tsx\")",
+      "Bash(find \"/Users/onuroztaskiran/FE Apps/tt6/mftr-26/src/app/\\(convex\\)/admin/posts\" -type f -name \"*.tsx\" -o -name \"*.ts\")",
+      "Bash(npx tessl i github:jezweb/claude-skills --skill tiptap)",
+      "Bash(curl -s \"https://api.github.com/repos/jezweb/claude-skills/contents/plugins\")",
+      "Bash(curl -s \"https://api.github.com/search/repositories?q=tiptap+claude+skill+SKILL.md&sort=stars&order=desc\")",
+      "WebFetch(domain:claude-plugins.dev)",
+      "Bash(curl -s \"https://api.github.com/repos/alirezarezvani/claude-skills/git/trees/main?recursive=1\")",
+      "Bash(curl -s \"https://api.github.com/repos/daymade/claude-code-skills/git/trees/main?recursive=1\")",
+      "Bash(curl -s \"https://api.github.com/repos/levnikolaevich/claude-code-skills/git/trees/main?recursive=1\")",
+      "mcp__editor-annotations__editor_watch"
+    ]
+  }
+}

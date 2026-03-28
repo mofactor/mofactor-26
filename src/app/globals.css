@@ -1,0 +1,520 @@
+@import "tailwindcss";
+@import "./cms-safelist.css";
+/* @import "shadcn/tailwind.css"; */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@font-face {
+  font-family: nexofont;
+  src: url("/fonts/nexofont/nexofont-regular.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: nexofont;
+  src: url("/fonts/nexofont/nexofont-medium.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: nexofont;
+  src: url("/fonts/nexofont/nexofont-bold.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: geistMono;
+  src: url("/fonts/geist/GeistMono[wght].woff2") format("woff2");
+  font-display: swap;
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: geistMono;
+  src: url("/fonts/geist/GeistMono-Italic[wght].woff2") format("woff2");
+  font-display: swap;
+  font-weight: 100 900;
+  font-style: italic;
+}
+
+@theme {
+  --color-beige: #f7f6f5;
+  --color-beige-dark: #1a1a1a;
+  --color-lt-grey: #f9f9f9;
+
+  --color-body: var(--color-zinc-700);
+  --color-body-dark: var(--color-zinc-700);
+
+  --color-background: var(--color-zinc-100);
+
+
+  --color-foreground: var(--color-zinc-900);
+
+
+  --color-muted-foreground: var(--color-zinc-400);
+  --color-muted-foreground-dark: var(--color-zinc-500);
+
+  --color-zinc-125: oklch(95.7% 0.001 286.375);
+  --color-zinc-150: oklch(0.9373 0.0013 286.37);
+  --color-zinc-850: oklch(0.247 0.0151 285.24);
+  --color-zinc-925: oklch(0.1867 0.0104 284.5);
+  --color-zinc-1000: oklch(0.05 0.0104 284.5);
+
+  --font-sans: "nexofont", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: "Georgia", "Times New Roman", serif;
+  --font-mono: "geistMono", ui-monospace, monospace;
+
+  --text-trim-both: trim-both;
+  --text-trim-start: trim-start;
+  --text-trim-end: trim-end;
+
+  --text-smd: 15px;
+
+  --text-edge-both: cap alphabetic;
+  --text-edge-cap: cap alphabetic;
+  --text-edge-text: text;
+  --shadow-strong: 0 1px 1px 0.5px rgba(51, 51, 51, .05), 0 3px 3px -1.5px rgba(51, 51, 51, .06), 0 6px 6px -3px rgba(51, 51, 51, .05), 0 12px 12px -6px rgba(51, 51, 51, .06), 0 24px 24px -12px rgba(51, 51, 51, .06), 0 48px 48px -24px rgba(51, 51, 51, .05);
+  --shadow-card: 0 4px 8px rgba(41, 41, 41, 0.06), 0 2px 4px rgba(41, 41, 41, 0.04), 0 1px 2px rgba(41, 41, 41, 0.04), 0 0 0 1px rgba(41, 41, 41, 0.06), inset 0 -0.5px 0.5px rgba(41, 41, 41, 0.1), inset 0 -1px 0.5px rgba(0, 0, 0, 0.1);
+  --shadow-card-hover: 0 20px 24px -12px rgba(41, 41, 41, 0.1), 0 6px 14px rgba(41, 41, 41, 0.06), 0 2px 5px rgba(41, 41, 41, 0.04), 0 0 0 1px rgba(41, 41, 41, 0.12), inset 0 -0.5px 0.5px rgba(41, 41, 41, 0.15), inset 0 -1px 0.5px rgba(0, 0, 0, 0.05);
+  --shadow-border: 0 2px 4px rgba(41, 41, 41, 0.06), 0 2px 4px rgba(41, 41, 41, 0.04), inset 0 -1px 2px rgba(41, 41, 41, 0.14), inset 0 0 0 1px rgba(41, 41, 41, 0.12), inset 0 -1px 0 0 rgba(41, 41, 41, 0.05);
+}
+
+@utility text-xsmd {
+  font-size: 13px;
+}
+
+@utility text-trim-* {
+  text-box-trim: --value(--text-trim-*, "none");
+}
+
+@utility text-edge-* {
+  text-box-edge: --value(--text-edge-*, "text", "alphabetic", "ideographic", "cap", "ex", [*]);
+}
+
+/* Shadcn semantic tokens (light) */
+:root {
+  --nav-fade-base: var(--color-background);
+  --radius: 0.625rem;
+  --primary: var(--color-zinc-900);
+  --primary-foreground: var(--color-zinc-50);
+  --secondary: var(--color-zinc-100);
+  --secondary-foreground: var(--color-zinc-900);
+  --muted: var(--color-zinc-100);
+  --accent: var(--color-zinc-100);
+  --accent-foreground: var(--color-zinc-900);
+  --destructive: var(--color-red-600);
+  --border: var(--color-zinc-200);
+  --input: var(--color-zinc-200);
+  --ring: var(--color-zinc-400);
+}
+
+/* Shadcn semantic tokens (dark) */
+.dark {
+  --color-body: var(--color-zinc-300);
+  --color-foreground: var(--color-zinc-50);
+  --color-background: var(--color-zinc-925);
+  --nav-fade-base: var(--color-zinc-925);
+  --primary: var(--color-zinc-100);
+  --primary-foreground: var(--color-zinc-900);
+  --secondary: var(--color-zinc-800);
+  --secondary-foreground: var(--color-zinc-50);
+  --muted: var(--color-zinc-800);
+  --accent: var(--color-zinc-700);
+  --accent-foreground: var(--color-zinc-50);
+  --destructive: var(--color-red-500);
+  --border: var(--color-zinc-800);
+  --input: var(--color-zinc-800);
+  --ring: var(--color-zinc-500);
+}
+
+/* Register shadcn tokens as Tailwind utilities */
+@theme inline {
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+}
+
+html {
+  scroll-behavior: smooth;
+  letter-spacing: 0.02em;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-background);
+  color: var(--color-body);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+a,
+img,
+button {
+
+  outline: none !important;
+}
+
+/* Section heading style */
+.section-heading-muted {
+  color: #bbb;
+}
+
+.dark .section-heading-muted {
+  color: #555;
+}
+
+/* Container */
+.container {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+/* Logo crossfade carousel animations */
+.logo-container {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 2.5rem;
+  place-items: center;
+}
+
+
+
+/* Blog link row */
+.blog-row {
+  border-bottom: 1px solid #e5e5e5;
+  padding: 1.25rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: opacity 0.2s ease;
+}
+
+.dark .blog-row {
+  border-bottom-color: #333;
+}
+
+.blog-row:hover {
+  opacity: 0.6;
+}
+
+/* Content-width defaults — in @layer components so Tailwind utilities
+   (like max-w-full) applied via the class picker can override them */
+@layer components {
+  .blog-prose>* {
+    max-width: var(--container-2xl);
+    margin-inline: auto;
+  }
+
+  .blog-prose>.wide {
+    max-width: var(--container-4xl);
+  }
+
+  .blog-prose>.full {
+    max-width: none;
+  }
+}
+
+/* Blog prose typography */
+.blog-prose {
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: var(--color-body);
+
+  &>*+* {
+    margin-top: 1.5em;
+  }
+
+  &> :first-child,
+  & :is(li, blockquote, [data-type="column"], [data-type="styled-block"])> :is(p, h1, h2, h3):first-child {
+    margin-top: 0;
+  }
+
+  & li>p+p {
+    margin-top: 0.5em;
+  }
+
+  & h1,
+  & h2,
+  & h3,
+  & h4,
+  & h5,
+  & h6 {
+    font-weight: 500;
+    color: var(--color-foreground);
+  }
+
+  /* & h1 {
+    font-size: 3rem;
+    line-height: 1.15;
+  } */
+
+  & h2 {
+    font-size: 1.75rem;
+    line-height: 1.25;
+
+    margin-top: 1.75em;
+  }
+
+  & h3 {
+    font-size: 1.375rem;
+    line-height: 1.35;
+    margin-top: 1.5em;
+  }
+
+  & strong {
+    font-weight: 500;
+    color: var(--color-foreground);
+  }
+
+  & p {
+    margin-top: 1.5em;
+  }
+
+  & a {
+    color: var(--color-foreground);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--color-zinc-300);
+    transition: text-decoration-color 0.2s;
+
+    &:hover {
+      text-decoration-color: var(--color-foreground);
+    }
+  }
+
+  & blockquote {
+    border-left: 3px solid var(--color-zinc-900);
+    padding-left: 1.5rem;
+    position: relative;
+    left: -1.5rem;
+
+  }
+
+  & pre {
+    background: var(--color-zinc-100);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    overflow-x: auto;
+    line-height: 1.6;
+
+    & code {
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+  }
+
+  & code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background: var(--color-zinc-100);
+    padding: 0.15em 0.35em;
+    border-radius: 0.25rem;
+  }
+
+  & ul,
+  & ol {
+    padding-left: 0;
+    list-style: none;
+    position: relative;
+
+  }
+
+  & ul ul,
+  & ol ol {
+    margin-top: 0.25em;
+    padding-left: 1.5rem;
+  }
+
+  & ul {
+    /* list-style: disc; */
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & ul li {
+    position: relative;
+  }
+
+  & ul li::before {
+    content: "";
+    /* color: var(--color-zinc-300); */
+    position: absolute;
+    display: inline-block;
+    left: -1.25rem;
+    top: 0.7rem;
+    width: 0.4rem;
+    height: 0.4rem;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+  }
+
+
+
+  & li+li {
+    margin-top: 0.5em;
+  }
+
+  & img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Default rounding — only when no user classes are set on the image */
+  & figure[data-class=""] img,
+  & figure:not([data-class]) img,
+  & :not(figure)>img {
+    border-radius: 0.75rem;
+  }
+
+  & hr {
+    border: none;
+    border-top: 1px solid var(--color-zinc-200);
+    margin-block: 2em;
+  }
+
+  & figure {
+    margin-block: --spacing(10);
+  }
+
+  & figcaption {
+    margin-top: 0.5em;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--color-zinc-400);
+  }
+}
+
+/* Dark mode overrides for blog prose */
+.dark .blog-prose {
+  & a {
+    text-decoration-color: var(--color-zinc-600);
+  }
+
+  & blockquote {
+    border-left-color: var(--color-zinc-600);
+  }
+
+  & pre {
+    background: oklch(0.17 0.01 285);
+  }
+
+  & code {
+    background: var(--color-zinc-850);
+  }
+
+  & hr {
+    border-top-color: var(--color-zinc-800);
+  }
+}
+
+/* Hide scrollbar for carousel */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Video fullscreen — show original ratio, no cropping */
+.video-player:fullscreen {
+  aspect-ratio: auto;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  border-radius: 0;
+
+  & video {
+    object-fit: contain;
+  }
+}
+
+/* Dialog / Lightbox animations (shadcn animate-in / animate-out) */
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0),
+        var(--tw-enter-translate-y, 0),
+        0) scale3d(var(--tw-enter-scale, 1),
+        var(--tw-enter-scale, 1),
+        var(--tw-enter-scale, 1)) rotate(var(--tw-enter-rotate, 0));
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(var(--tw-exit-translate-x, 0),
+        var(--tw-exit-translate-y, 0),
+        0) scale3d(var(--tw-exit-scale, 1),
+        var(--tw-exit-scale, 1),
+        var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0));
+  }
+}
+
+@utility animate-in {
+  animation-name: enter;
+  animation-duration: 250ms;
+  --tw-enter-opacity: initial;
+  --tw-enter-scale: initial;
+  --tw-enter-rotate: initial;
+  --tw-enter-translate-x: initial;
+  --tw-enter-translate-y: initial;
+}
+
+@utility animate-out {
+  animation-name: exit;
+  animation-duration: 250ms;
+  --tw-exit-opacity: initial;
+  --tw-exit-scale: initial;
+  --tw-exit-rotate: initial;
+  --tw-exit-translate-x: initial;
+  --tw-exit-translate-y: initial;
+}
+
+@utility fade-in-* {
+  --tw-enter-opacity: --value(integer, [percentage]);
+}
+
+@utility fade-out-* {
+  --tw-exit-opacity: --value(integer, [percentage]);
+}
+
+@utility zoom-in-* {
+  --tw-enter-scale: calc(--value(integer) / 100);
+}
+
+@utility zoom-out-* {
+  --tw-exit-scale: calc(--value(integer) / 100);
+}
