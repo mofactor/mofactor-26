@@ -1,0 +1,6 @@
+[submodule ".claude/skills/threejs-skills"]
+	path = .claude/skills/threejs-skills
+	url = https://github.com/CloudAI-X/threejs-skills.git
+[submodule ".claude/skills/webgpu-claude-skill"]
+	path = .claude/skills/webgpu-claude-skill
+	url = https://github.com/dgreenheck/webgpu-claude-skill.git
