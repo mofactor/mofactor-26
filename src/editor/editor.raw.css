@@ -93,12 +93,19 @@
   position: fixed;
   top: 0;
   left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  margin: 4px;
   z-index: 9990;
   background: rgba(24, 24, 27, 0.9);
   color: var(--ed-text-white);
   text-align: center;
-  padding: 3px 0;
+  padding: 4px 12px;
+  max-width: max-content;
   font-size: 11px;
+  border-radius: 4px;
   pointer-events: none;
 }
 
@@ -177,7 +184,7 @@
 
 /* ── Page offset when sidebar open ── */
 html.editor-active {
-  margin-right: 340px;
+  margin-right: 344px;
   transition: margin-right 0.2s ease-out;
 
   [class~="fixed"][class~="w-full"]:not([class*="editor-"]) {
@@ -268,9 +275,8 @@ html.editor-active {
 /* ── Sidebar ── */
 .editor-panel {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
+  inset: 4px 4px 4px auto;
+
   z-index: 9995;
   width: var(--ed-sidebar-w);
   color: var(--ed-text);
@@ -278,6 +284,7 @@ html.editor-active {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border-radius: 8px;
 }
 
 .editor-panel-header {
@@ -482,7 +489,7 @@ html.editor-active {
 
 .editor-chip--original {
   background: var(--ed-border);
-  color: var(--ed-dim);
+  color: var(--ed-text-white);
 }
 
 .editor-chip--added {
@@ -866,16 +873,33 @@ html.editor-active {
 
 /* ── Comment read-only row ── */
 .editor-annotation-comment-row {
-  display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
 }
+
 .editor-annotation-comment-text {
-  flex: 1; color: var(--ed-text-bright); font-size: 12px; line-height: 1.4;
-  white-space: pre-wrap; word-break: break-word;
+  flex: 1;
+  color: var(--ed-text-bright);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
+
 .editor-annotation-comment-edit {
-  background: none; border: none; cursor: pointer;
-  color: var(--ed-muted); font-size: 10px; padding: 0; flex-shrink: 0;
-  &:hover { color: var(--ed-text-bright); }
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ed-muted);
+  font-size: 10px;
+  padding: 0;
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--ed-text-bright);
+  }
 }
 
 /* ── Status badge ── */
@@ -973,19 +997,29 @@ html.editor-active {
     overflow-x: auto;
     margin: 6px 0;
 
-    code { background: none; padding: 0; }
+    code {
+      background: none;
+      padding: 0;
+    }
   }
 
-  strong { color: var(--ed-text-bright); }
+  strong {
+    color: var(--ed-text-bright);
+  }
 
-  ul, ol {
+  ul,
+  ol {
     margin: 4px 0;
     padding-left: 16px;
   }
 
-  li { margin: 2px 0; }
+  li {
+    margin: 2px 0;
+  }
 
-  p { margin: 4px 0; }
+  p {
+    margin: 4px 0;
+  }
 }
 
 /* ── Thinking indicator ── */

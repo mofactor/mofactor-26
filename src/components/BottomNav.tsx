@@ -369,7 +369,15 @@ export default function BottomNav({ items: navItems = DEFAULT_NAV_ITEMS }: { ite
                   ref={(el) => { itemRefs.current[index] = el; }}
                   href={item.href}
                   onClick={(e) => {
-                    if (justDraggedRef.current) e.preventDefault();
+                    if (justDraggedRef.current) { e.preventDefault(); return; }
+                    // Replace history instead of pushing so back button
+                    // skips past section changes to the actual previous page.
+                    e.preventDefault();
+                    const target = document.querySelector(item.href);
+                    if (target) {
+                      target.scrollIntoView({ behavior: "smooth" });
+                      history.replaceState(null, "", item.href);
+                    }
                   }}
                   className="w-4 flex-shrink-0 relative flex flex-col items-center"
                 >

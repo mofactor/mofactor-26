@@ -1,4 +1,22 @@
 {
   "version": 1,
-  "patches": []
+  "patches": [
+    {
+      "id": "3zpy6cv3",
+      "selector": "body > div:nth-of-type(2) > div:nth-of-type(12) > div:nth-of-type(2) > a:nth-of-type(2) > span",
+      "pathname": "/work/solitonic",
+      "operations": [
+        {
+          "type": "text",
+          "value": "Intro"
+        }
+      ],
+      "originalText": "Overview",
+      "originalClasses": "absolute font-medium text-[18px] text-trim-both text-edge-both -bottom-12 py-3 rounded-lg left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-[250ms] ease-in-out text-black bg-white/80 backdrop-blur-md px-4",
+      "originalStyles": "",
+      "componentName": "BottomNav",
+      "createdAt": "2026-03-29T21:08:43.411Z",
+      "updatedAt": "2026-03-29T21:08:43.411Z"
+    }
+  ]
 }
