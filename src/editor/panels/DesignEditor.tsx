@@ -1,0 +1,89 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import {
+  parseDesignClasses,
+  getPaddingForVariant,
+  getOverflowForVariant,
+  getVariantKey,
+} from "../tailwind/design-parser";
+import DesignModeBar, {
+  type Breakpoint,
+  type ThemeMode,
+} from "./design/DesignModeBar";
+import PaddingSection from "./design/PaddingSection";
+import OverflowSection from "./design/OverflowSection";
+
+interface DesignEditorProps {
+  element: HTMLElement;
+  effectiveClasses: string;
+  onAddClass: (cls: string) => void;
+  onRemoveClass: (cls: string) => void;
+}
+
+export default function DesignEditor({
+  element,
+  effectiveClasses,
+  onAddClass,
+  onRemoveClass,
+}: DesignEditorProps) {
+  const [breakpoint, setBreakpoint] = useState<Breakpoint>("base");
+  const [theme, setTheme] = useState<ThemeMode>("light");
+
+  // Parse all design values from current classes
+  const parsed = useMemo(
+    () => parseDesignClasses(effectiveClasses),
+    [effectiveClasses]
+  );
+
+  // Current variant key based on mode bar selection
+  const variantKey = useMemo(
+    () => getVariantKey(breakpoint, theme),
+    [breakpoint, theme]
+  );
+
+  // Get values for the active variant
+  const paddingSides = useMemo(
+    () => getPaddingForVariant(parsed, variantKey),
+    [parsed, variantKey]
+  );
+
+  const overflowValue = useMemo(
+    () => getOverflowForVariant(parsed, variantKey),
+    [parsed, variantKey]
+  );
+
+  return (
+    <div>
+      <DesignModeBar
+        breakpoint={breakpoint}
+        theme={theme}
+        onChangeBreakpoint={setBreakpoint}
+        onChangeTheme={setTheme}
+      />
+
+      {/* Padding */}
+      <div className="editor-design-section">
+        <div className="editor-design-section-label">Padding</div>
+        <PaddingSection
+          paddingSides={paddingSides}
+          variantKey={variantKey}
+          currentClasses={effectiveClasses}
+          onAddClass={onAddClass}
+          onRemoveClass={onRemoveClass}
+        />
+      </div>
+
+      {/* Overflow */}
+      <div className="editor-design-section">
+        <OverflowSection
+          overflowValue={overflowValue}
+          variantKey={variantKey}
+          currentClasses={effectiveClasses}
+          onAddClass={onAddClass}
+          onRemoveClass={onRemoveClass}
+        />
+      </div>
+    </div>
+  );
+}

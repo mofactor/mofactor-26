@@ -4,13 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useEditor } from "./EditorProvider";
 import { getComponentPropsStack } from "./engine/fiber";
 import ClassEditor from "./panels/ClassEditor";
+import DesignEditor from "./panels/DesignEditor";
 import MetaInfo from "./panels/MetaInfo";
 import PropsEditor, { type PropChange } from "./panels/PropsEditor";
 import StyleEditor from "./panels/StyleEditor";
 import TextEditor from "./panels/TextEditor";
 import type { Patch, PatchOperation } from "./types";
 
-type Tab = "text" | "styles" | "props" | "meta";
+type Tab = "text" | "design" | "styles" | "props" | "meta";
 
 function uid(): string {
   return Math.random().toString(36).slice(2, 10);
@@ -360,6 +361,7 @@ export default function EditorPanel() {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "text", label: "Text / Classes" },
+    { key: "design", label: "Design" },
     { key: "styles", label: "Styles" },
     ...(componentStack.length > 0 ? [{ key: "props" as Tab, label: "Props" }] : []),
     { key: "meta", label: "Meta" },
@@ -419,6 +421,14 @@ export default function EditorPanel() {
                   onRestoreClass={handleRestoreClass}
                 />
               </>
+            )}
+            {activeTab === "design" && (
+              <DesignEditor
+                element={element}
+                effectiveClasses={effectiveClasses}
+                onAddClass={handleAddClass}
+                onRemoveClass={handleRemoveClass}
+              />
             )}
             {activeTab === "styles" && (
               <StyleEditor

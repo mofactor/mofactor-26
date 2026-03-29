@@ -1108,3 +1108,221 @@ html.editor-active {
   align-items: stretch;
   margin-top: 6px;
 }
+
+/* ══════════════════════════════════════════════════════════
+   Design Tab
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Mode bar (breakpoint + theme selector) ── */
+.editor-design-modebar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ed-border);
+}
+
+.editor-design-modebar-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.editor-design-variant-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ed-accent);
+  background: rgba(245, 158, 11, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+  align-self: flex-start;
+}
+
+/* ── Design section ── */
+.editor-design-section {
+  margin-bottom: 12px;
+}
+
+.editor-design-section-label {
+  color: var(--ed-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+/* ── Spacing box (Figma-style inputs) ── */
+.editor-spacing-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.editor-spacing-row {
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.editor-spacing-field-wrap {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+.editor-spacing-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--ed-bg-subtle);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  padding: 5px 6px;
+  min-width: 0;
+
+  &:focus-within {
+    border-color: var(--ed-text);
+  }
+}
+
+.editor-spacing-icon {
+  color: var(--ed-muted);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.editor-spacing-input {
+  background: none;
+  border: none;
+  color: var(--ed-text-white);
+  font: inherit;
+  font-size: 12px;
+  width: 100%;
+  min-width: 0;
+  outline: none;
+  padding: 0;
+  caret-color: var(--ed-text-white);
+
+  &::placeholder {
+    color: var(--ed-muted);
+  }
+}
+
+.editor-spacing-hint {
+  color: var(--ed-muted);
+  font-size: 9px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.editor-spacing-toggle {
+  background: none;
+  border: 1px solid var(--ed-border);
+  border-radius: 4px;
+  color: var(--ed-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  padding: 0;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: var(--ed-text);
+    border-color: var(--ed-text);
+  }
+}
+
+.editor-spacing-toggle-spacer {
+  width: 28px;
+  flex-shrink: 0;
+}
+
+/* ── Spacing dropdown (preset values) ── */
+.editor-spacing-dropdown {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  max-height: 180px;
+  overflow-y: auto;
+  background: var(--ed-bg);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.editor-spacing-dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  cursor: pointer;
+  gap: 6px;
+
+  &:hover {
+    background: var(--ed-border);
+  }
+}
+
+.editor-spacing-dropdown-item--focused {
+  background: var(--ed-border);
+}
+
+.editor-spacing-dropdown-token {
+  color: var(--ed-text-white);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.editor-spacing-dropdown-css {
+  color: var(--ed-muted);
+  font-size: 10px;
+}
+
+.editor-spacing-dropdown-custom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  border-top: 1px solid var(--ed-border);
+  gap: 6px;
+}
+
+.editor-spacing-dropdown-custom .editor-spacing-dropdown-token {
+  color: var(--ed-accent);
+}
+
+.editor-spacing-dropdown-custom .editor-spacing-dropdown-css {
+  font-style: italic;
+}
+
+/* ── Overflow / Clip content ── */
+.editor-design-overflow {
+  display: flex;
+  align-items: center;
+}
+
+.editor-design-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--ed-text);
+  user-select: none;
+}
+
+.editor-design-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--ed-text);
+  cursor: pointer;
+  border-radius: 4px;
+}

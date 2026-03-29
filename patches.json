@@ -17,6 +17,23 @@
       "componentName": "BottomNav",
       "createdAt": "2026-03-29T21:08:43.411Z",
       "updatedAt": "2026-03-29T21:08:43.411Z"
+    },
+    {
+      "id": "ly5r62b4",
+      "selector": "section#root > div > header",
+      "pathname": "/work/airbit",
+      "operations": [
+        {
+          "type": "addClass",
+          "className": "dark:pt-0"
+        }
+      ],
+      "originalText": "End-to-End DesignEnd-to-End DesignFor AirbitFor AirbitEnd-to-end design for the world's leading marketplace for beats, enabling creators to sell music globally.End-to-end design for the world's leading marketplace for beats, enabling creators to sell music globally.",
+      "originalClasses": "grid grid-cols-1 md:grid-cols-12 items-end gap-10 md:gap-6 pt-32 pb-20",
+      "originalStyles": "",
+      "componentName": "AirbitPage",
+      "createdAt": "2026-03-29T22:15:24.978Z",
+      "updatedAt": "2026-03-29T22:15:24.978Z"
     }
   ]
 }
