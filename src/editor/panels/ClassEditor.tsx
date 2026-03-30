@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { useEditor } from "../EditorProvider";
 import type { TailwindClass } from "../types";
 
@@ -34,7 +35,6 @@ export default function ClassEditor({
     [originalClasses]
   );
 
-  // Get current effective classes
   const currentClasses = useMemo(() => {
     const base = new Set(originalList);
     removedClasses.forEach((c) => base.delete(c));
@@ -42,7 +42,6 @@ export default function ClassEditor({
     return Array.from(base);
   }, [originalList, addedClasses, removedClasses]);
 
-  // Autocomplete search
   useEffect(() => {
     if (!query || !editor?.tailwindIndex) {
       setSuggestions([]);
@@ -50,10 +49,7 @@ export default function ClassEditor({
       return;
     }
     const results = editor.tailwindIndex.search(query, { limit: 20 });
-    // Filter out already-present classes
-    const filtered = results.filter(
-      (r) => !currentClasses.includes(r.name)
-    );
+    const filtered = results.filter((r) => !currentClasses.includes(r.name));
     setSuggestions(filtered);
     setFocusedIdx(-1);
   }, [query, editor?.tailwindIndex, currentClasses]);
@@ -72,7 +68,6 @@ export default function ClassEditor({
           onAddClass(suggestions[focusedIdx].name);
           setQuery("");
         } else if (query.trim()) {
-          // Add raw class even if not in suggestions
           onAddClass(query.trim());
           setQuery("");
         }
@@ -87,44 +82,58 @@ export default function ClassEditor({
   return (
     <div>
       {/* Current class chips */}
-      <div className="editor-class-chips">
+      <div className="flex flex-wrap gap-1 mb-2">
         {originalList.map((cls) => {
           const isRemoved = removedClasses.includes(cls);
           return (
             <span
               key={`orig-${cls}`}
-              className={`editor-chip ${isRemoved ? "editor-chip--removed" : "editor-chip--original"}`}
+              className={cn(
+                "inline-flex items-center gap-1 px-2 py-px rounded text-[11px] leading-[1.5]",
+                isRemoved
+                  ? "bg-rose-400/15 text-rose-400 line-through"
+                  : "bg-zinc-700 text-zinc-100"
+              )}
             >
               {cls}
               {isRemoved ? (
-                <button onClick={() => onRestoreClass(cls)} title="Restore">
+                <button
+                  className="bg-transparent border-none cursor-pointer p-0 text-[inherit] text-[12px] opacity-50 hover:opacity-100"
+                  onClick={() => onRestoreClass(cls)}
+                  title="Restore"
+                >
                   +
                 </button>
               ) : (
-                <button onClick={() => onRemoveClass(cls)} title="Remove">
-                  x
+                <button
+                  className="bg-transparent border-none cursor-pointer p-0 text-[inherit] text-[12px] opacity-50 hover:opacity-100"
+                  onClick={() => onRemoveClass(cls)}
+                  title="Remove"
+                >
+                  ×
                 </button>
               )}
             </span>
           );
         })}
         {addedClasses.map((cls) => (
-          <span key={`add-${cls}`} className="editor-chip editor-chip--added">
+          <span key={`add-${cls}`} className="inline-flex items-center gap-1 px-2 py-px rounded text-[11px] leading-[1.5] bg-green-500/15 text-green-400">
             {cls}
             <button
+              className="bg-transparent border-none cursor-pointer p-0 text-[inherit] text-[12px] opacity-50 hover:opacity-100"
               onClick={() => onRemoveClass(cls)}
               title="Remove"
             >
-              x
+              ×
             </button>
           </span>
         ))}
       </div>
 
-      {/* Autocomplete input — tabIndex -1 prevents auto-focus on panel render */}
+      {/* Autocomplete input */}
       <input
         ref={inputRef}
-        className="editor-autocomplete-input"
+        className="w-full px-2 py-1.5 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-md text-[12px] outline-none focus:border-zinc-300 font-[inherit]"
         type="text"
         placeholder="Add class (e.g. text-blue-500)..."
         value={query}
@@ -139,11 +148,14 @@ export default function ClassEditor({
 
       {/* Suggestions dropdown */}
       {suggestions.length > 0 && (
-        <div className="editor-autocomplete-list">
+        <div className="max-h-40 overflow-y-auto mt-1 bg-zinc-800 border border-zinc-700 rounded-md">
           {suggestions.map((cls, i) => (
             <div
               key={cls.name}
-              className={`editor-autocomplete-item ${i === focusedIdx ? "editor-autocomplete-item--focused" : ""}`}
+              className={cn(
+                "px-2 py-1 cursor-pointer flex justify-between gap-2 hover:bg-zinc-700",
+                i === focusedIdx && "bg-zinc-700"
+              )}
               onClick={() => {
                 onAddClass(cls.name);
                 setQuery("");
@@ -151,15 +163,15 @@ export default function ClassEditor({
               }}
               onMouseEnter={() => setFocusedIdx(i)}
             >
-              <span className="editor-ac-name">{cls.name}</span>
-              <span className="editor-ac-category">{cls.category}</span>
+              <span className="text-zinc-300">{cls.name}</span>
+              <span className="text-zinc-500 text-[10px]">{cls.category}</span>
             </div>
           ))}
         </div>
       )}
 
       {editor?.tailwindIndex && (
-        <div style={{ marginTop: 8, fontSize: 10, color: "#71717a" }}>
+        <div className="mt-2 text-[10px] text-zinc-500">
           {editor.tailwindIndex.size} classes indexed
         </div>
       )}

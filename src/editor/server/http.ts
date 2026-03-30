@@ -27,6 +27,16 @@ import {
 } from "./orchestrator.js";
 
 // =============================================================================
+// Activity tracking (for dead-man's-switch shutdown)
+// =============================================================================
+
+export let lastActivityAt = Date.now();
+
+export function touchActivity(): void {
+  lastActivityAt = Date.now();
+}
+
+// =============================================================================
 // Helpers
 // =============================================================================
 
@@ -290,6 +300,8 @@ export function startHttpServer(port = 4747): Promise<http.Server> {
       const url = new URL(req.url || "/", `http://localhost:${port}`);
       const method = req.method?.toUpperCase() || "GET";
       const pathname = url.pathname;
+
+      touchActivity();
 
       // CORS preflight
       if (method === "OPTIONS") {

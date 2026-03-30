@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EDITOR_ATTR } from "./constants";
 import { useEditor } from "./EditorProvider";
+import { cn } from "@/lib/utils";
 
 /** Build a short label like `<div.flex.gap-4>` or `<a#logo>` */
 function formatElementLabel(el: HTMLElement): string {
@@ -12,7 +13,6 @@ function formatElementLabel(el: HTMLElement): string {
   const classes = el.className;
   if (typeof classes === "string" && classes.trim()) {
     const list = classes.trim().split(/\s+/);
-    // Prefer non-utility classes (no colon, longer names) over Tailwind utilities
     const meaningful = list
       .filter((c) => !c.startsWith("editor-"))
       .slice(0, 3);
@@ -106,23 +106,19 @@ export default function EditorOverlay() {
       const target = e.target as HTMLElement;
       if (!target || isEditorElement(target)) return;
 
-      // Allow click-through on the selected element when it's contentEditable (inline text editing)
       if (editor.selectedElement?.contains(target) && editor.selectedElement.isContentEditable) {
         return;
       }
 
       e.preventDefault();
       e.stopPropagation();
-
       editor.selectElement(target);
     };
 
-    // Also prevent mousedown to avoid triggering site's handlers
     const handleMouseDown = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target || isEditorElement(target)) return;
 
-      // Allow mousedown on the selected element when it's contentEditable (cursor placement, text selection)
       if (editor.selectedElement?.contains(target) && editor.selectedElement.isContentEditable) {
         return;
       }
@@ -166,7 +162,7 @@ export default function EditorOverlay() {
 
   if (!editor) return null;
 
-  // Label position: above the rect's top-left, flip below if near viewport top
+  // Label: above rect top-left, flip below if near viewport top
   const labelForRect = (
     rect: DOMRect,
     el: HTMLElement | null,
@@ -177,7 +173,13 @@ export default function EditorOverlay() {
     const top = aboveTop >= 0 ? aboveTop : rect.bottom + 2;
     return (
       <div
-        className={`editor-element-label${variant === "hover" ? " editor-element-label--hover" : ""}`}
+        className={cn(
+          // base label
+          "fixed z-[9992] bg-zinc-900/85 text-zinc-100 text-[12px] px-2 py-px rounded-[3px]",
+          "pointer-events-none whitespace-nowrap max-w-[280px] overflow-hidden text-ellipsis leading-[1.5]",
+          // hover variant: dimmer
+          variant === "hover" && "bg-zinc-900/55"
+        )}
         style={{ top, left: rect.left }}
       >
         {formatElementLabel(el)}
@@ -189,29 +191,33 @@ export default function EditorOverlay() {
     <>
       {/* Edit mode banner */}
       {editor.editMode && (
-        <div className="editor-mode-banner">EDIT MODE — click any element to inspect</div>
+        <div
+          className="fixed top-0 left-0 flex items-center justify-center px-3 py-1 m-1 z-[9990]
+            bg-zinc-900/90 text-zinc-100 text-center max-w-max text-[11px] rounded pointer-events-none"
+          style={{ right: "var(--ed-sidebar-w, 340px)" }}
+        >
+          EDIT MODE — click any element to inspect
+        </div>
       )}
 
-      {/* Hover highlight + label */}
+      {/* Hover highlight */}
       {editor.editMode && hoverRect && (
-        <>
-          <div
-            className="editor-highlight"
-            style={{
-              top: hoverRect.top,
-              left: hoverRect.left,
-              width: hoverRect.width,
-              height: hoverRect.height,
-            }}
-          />
-        </>
+        <div
+          className="fixed pointer-events-none z-[9990] border-2 border-zinc-900/60 rounded-[3px] transition-all duration-[25ms] ease-out dark:border-zinc-100/60"
+          style={{
+            top: hoverRect.top,
+            left: hoverRect.left,
+            width: hoverRect.width,
+            height: hoverRect.height,
+          }}
+        />
       )}
 
       {/* Selected highlight + label */}
       {selectedRect && (
         <>
           <div
-            className="editor-highlight editor-highlight--selected"
+            className="fixed pointer-events-none z-[9990] border-2 border-zinc-900/90 bg-zinc-900/[0.06] rounded-[3px] transition-all duration-[25ms] ease-out dark:border-zinc-100/90 dark:bg-zinc-100/[0.06]"
             style={{
               top: selectedRect.top,
               left: selectedRect.left,

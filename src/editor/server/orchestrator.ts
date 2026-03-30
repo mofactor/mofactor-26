@@ -4,6 +4,7 @@
  */
 
 import { execSync } from "node:child_process";
+import { existsSync, copyFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { query } from "@anthropic-ai/claude-agent-sdk";
 import type { SDKMessage } from "@anthropic-ai/claude-agent-sdk";
@@ -73,6 +74,28 @@ function createWorktree(branchName: string): string {
     cwd: projectCwd,
     stdio: "pipe",
   });
+
+  // Copy uncommitted changes from main working directory into the worktree
+  // so agents see the current state, not the last commit
+  try {
+    const modified = execSync("git diff --name-only", {
+      cwd: projectCwd,
+      stdio: "pipe",
+      encoding: "utf-8",
+    }).trim();
+    if (modified) {
+      for (const file of modified.split("\n").filter(Boolean)) {
+        const src = path.join(projectCwd, file);
+        const dest = path.join(worktreeDir, file);
+        if (existsSync(src)) {
+          mkdirSync(path.dirname(dest), { recursive: true });
+          copyFileSync(src, dest);
+        }
+      }
+      console.error(`[orchestrator] Synced ${modified.split("\n").filter(Boolean).length} modified file(s) into worktree`);
+    }
+  } catch { /* non-critical — agent will work from HEAD */ }
+
   return worktreeDir;
 }
 
@@ -89,6 +112,43 @@ function removeWorktree(worktreePath: string, branchName: string): void {
       stdio: "pipe",
     });
   } catch { /* may already be removed */ }
+}
+
+/**
+ * Copy changed files from the agent worktree back to the main project directory.
+ * Returns list of files applied, or null if nothing changed.
+ */
+function applyWorktreeChanges(worktreePath: string): string[] | null {
+  if (!existsSync(worktreePath)) {
+    console.error(`[orchestrator] Worktree already removed: ${worktreePath}`);
+    return null;
+  }
+
+  // Get list of files changed relative to HEAD (the base commit)
+  let changed: string;
+  try {
+    changed = execSync("git diff HEAD --name-only", {
+      cwd: worktreePath,
+      stdio: "pipe",
+      encoding: "utf-8",
+    }).trim();
+  } catch {
+    console.error(`[orchestrator] Could not diff worktree (may be gone): ${worktreePath}`);
+    return null;
+  }
+
+  if (!changed) return null;
+
+  const files = changed.split("\n").filter(Boolean);
+  for (const file of files) {
+    const src = path.join(worktreePath, file);
+    const dest = path.join(projectCwd, file);
+    mkdirSync(path.dirname(dest), { recursive: true });
+    copyFileSync(src, dest);
+  }
+
+  console.error(`[orchestrator] Applied ${files.length} file(s) to working directory: ${files.join(", ")}`);
+  return files;
 }
 
 // =============================================================================
@@ -194,11 +254,11 @@ export function spawnAgent(
       systemPrompt: {
         type: "preset",
         preset: "claude_code",
-        append: `You are an autonomous agent working on a specific annotation. Work silently and commit your changes when done. Do not ask questions — just implement what was requested.
+        append: `You are an autonomous agent working on a specific annotation. Work silently — read the source, edit the file, then stop. Do not ask questions — just implement what was requested.
 
-IMPORTANT: Do NOT use any editor-annotations MCP tools (editor_watch, editor_acknowledge, editor_reply, editor_resolve, editor_dismiss, editor_list_sessions, editor_get_pending). You must NOT run an annotation feedback loop. Your only job is to read the code, implement the change, and commit. The orchestrator will handle all annotation status updates.`,
+CRITICAL: Do NOT run any git commands (git add, git commit, git push, etc). Do NOT use any editor-annotations MCP tools. Your ONLY job is to read the code, edit the file, and stop. The orchestrator handles everything else.`,
       },
-      settingSources: ["project"],
+      settingSources: [],
       persistSession: false,
     },
   });
@@ -223,28 +283,24 @@ async function processAgentStream(
     handle.status = "working";
     handle.lastActivity = Date.now();
     updateAnnotationAgent(handle.annotationId, { agentStatus: "working" });
+    updateAnnotation(handle.annotationId, { status: "acknowledged" });
+    addThreadMessage(handle.annotationId, "agent", "Looking at the code...");
 
     for await (const message of generator) {
       handle.lastActivity = Date.now();
 
       if (message.type === "assistant") {
         handle.turnsUsed++;
-        // Extract text from assistant message
+        // Extract text from assistant message — post to thread for live feedback
         const textBlocks = (message.message.content as Array<{ type: string; text?: string }>)
           .filter((b) => b.type === "text" && b.text)
           .map((b) => b.text!);
         if (textBlocks.length > 0) {
           const snippet = textBlocks.join(" ").slice(0, 200);
-          eventBus.emit("agent.progress", handle.sessionId, {
-            agentId: handle.agentId,
-            annotationId: handle.annotationId,
-            type: "assistant",
-            snippet,
-            turnNumber: handle.turnsUsed,
-            timestamp: Date.now(),
-          });
+          addThreadMessage(handle.annotationId, "agent", snippet);
         }
       } else if (message.type === "tool_use_summary") {
+        // Emit progress event (no thread message — assistant messages already cover it)
         eventBus.emit("agent.progress", handle.sessionId, {
           agentId: handle.agentId,
           annotationId: handle.annotationId,
@@ -259,18 +315,30 @@ async function processAgentStream(
           handle.completedAt = Date.now();
           handle.summary = message.result.slice(0, 500);
 
+          // Apply file changes from worktree back to the main project
+          try {
+            const applied = applyWorktreeChanges(handle.worktreePath);
+            if (applied) {
+              console.error(`[orchestrator] Applied changes: ${applied.join(", ")}`);
+            }
+          } catch (applyErr) {
+            console.error(`[orchestrator] Could not apply worktree changes (may already be cleaned up):`, applyErr);
+          }
+
+          // Clean up worktree
+          try { removeWorktree(handle.worktreePath, handle.branchName); } catch { /* ok */ }
+
           updateAnnotationAgent(handle.annotationId, {
             agentStatus: "done",
             agentSummary: handle.summary,
             agentBranch: handle.branchName,
           });
 
-          // Resolve annotation + post summary
+          // Resolve annotation
           updateAnnotation(handle.annotationId, {
             status: "resolved",
             resolvedBy: `agent:${handle.agentId}`,
           });
-          addThreadMessage(handle.annotationId, "agent", handle.summary || "Done.");
 
           console.error(
             `[orchestrator] Agent ${handle.agentId} completed (${handle.turnsUsed} turns, ${message.total_cost_usd?.toFixed(4) ?? "?"} USD)`
@@ -327,6 +395,21 @@ export function abortAgent(agentId: string): boolean {
   return true;
 }
 
+/** Abort all active agents and clean up worktrees. Called during shutdown. */
+export function abortAllAgents(): void {
+  for (const [id, handle] of agents) {
+    if (handle.status === "spawning" || handle.status === "working") {
+      handle.abortController.abort();
+      handle.status = "aborted";
+      handle.completedAt = Date.now();
+      console.error(`[orchestrator] Shutdown: aborted agent ${id}`);
+    }
+    try { removeWorktree(handle.worktreePath, handle.branchName); } catch { /* ok */ }
+  }
+  agents.clear();
+  annotationToAgent.clear();
+}
+
 // =============================================================================
 // Follow-up reply handling
 // =============================================================================
@@ -366,6 +449,10 @@ export function initOrchestrator(config: { projectCwd: string }): void {
       const annotation = event.payload as ServerAnnotation;
       if (annotation.timestamp < startedAt) {
         console.error(`[orchestrator] Skipping stale annotation ${annotation.id} (created before server start)`);
+        return;
+      }
+      if (annotation.status === "resolved" || annotation.status === "dismissed") {
+        console.error(`[orchestrator] Skipping already-resolved annotation ${annotation.id}`);
         return;
       }
       spawnAgent(annotation.id, event.sessionId, annotation);

@@ -9,9 +9,9 @@
  *   npx tsx src/editor/server/index.ts --port 5000  # Custom port
  */
 
-import { startHttpServer } from "./http.js";
+import { startHttpServer, lastActivityAt, touchActivity } from "./http.js";
 import { startMcpServer } from "./mcp.js";
-import { initOrchestrator } from "./orchestrator.js";
+import { initOrchestrator, abortAllAgents } from "./orchestrator.js";
 
 const args = process.argv.slice(2);
 const mcpOnly = args.includes("--mcp-only");
@@ -23,9 +23,42 @@ const httpUrl = (() => {
   return idx !== -1 ? args[idx + 1] : `http://localhost:${port}`;
 })();
 
+// =============================================================================
+// Graceful shutdown
+// =============================================================================
+
+const IDLE_TTL_MS = 5 * 60 * 1000; // 5 minutes with no activity → auto-exit
+let httpServer: import("node:http").Server | null = null;
+let ttlInterval: ReturnType<typeof setInterval> | null = null;
+let shuttingDown = false;
+
+function shutdown(reason: string): void {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.error(`[editor] Shutting down: ${reason}`);
+
+  // 1. Abort all running agents + clean worktrees
+  abortAllAgents();
+
+  // 2. Close HTTP server
+  if (httpServer) {
+    httpServer.close();
+    httpServer = null;
+  }
+
+  // 3. Clear TTL check
+  if (ttlInterval) {
+    clearInterval(ttlInterval);
+    ttlInterval = null;
+  }
+
+  // 4. Exit
+  setTimeout(() => process.exit(0), 500);
+}
+
 async function main(): Promise<void> {
   if (!mcpOnly) {
-    await startHttpServer(port);
+    httpServer = await startHttpServer(port);
 
     if (!noAgents) {
       initOrchestrator({ projectCwd: process.cwd() });
@@ -42,6 +75,18 @@ async function main(): Promise<void> {
   }
 
   await startMcpServer(httpUrl);
+
+  // --- Layer 1: stdin close detection ---
+  process.stdin.on("end", () => shutdown("stdin closed (parent process exited)"));
+  process.stdin.on("close", () => shutdown("stdin closed (parent process exited)"));
+
+  // --- Layer 2: idle TTL (dead man's switch) ---
+  touchActivity(); // reset timer at boot
+  ttlInterval = setInterval(() => {
+    if (Date.now() - lastActivityAt > IDLE_TTL_MS) {
+      shutdown(`idle for ${IDLE_TTL_MS / 1000}s with no activity`);
+    }
+  }, 30_000); // check every 30s
 }
 
 main().catch((err) => {

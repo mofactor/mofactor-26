@@ -12,55 +12,39 @@ export default function MetaInfo({ element, selector, sourceLocation }: MetaInfo
   const rect = element.getBoundingClientRect();
   const computedStyle = getComputedStyle(element);
 
+  const rows = [
+    { label: "Tag", value: element.tagName.toLowerCase() },
+    ...(element.id ? [{ label: "ID", value: `#${element.id}` }] : []),
+    { label: "Size", value: `${Math.round(rect.width)} × ${Math.round(rect.height)}` },
+    { label: "Position", value: computedStyle.position },
+    { label: "Display", value: computedStyle.display },
+    { label: "Font", value: `${computedStyle.fontSize} / ${computedStyle.fontWeight}` },
+    { label: "Color", value: computedStyle.color },
+  ];
+
   return (
     <div>
-      <div className="editor-meta-row">
-        <span className="editor-meta-label">Tag</span>
-        <span className="editor-meta-value">{element.tagName.toLowerCase()}</span>
-      </div>
-      {element.id && (
-        <div className="editor-meta-row">
-          <span className="editor-meta-label">ID</span>
-          <span className="editor-meta-value">#{element.id}</span>
+      {rows.map((row) => (
+        <div key={row.label} className="flex justify-between py-1 border-b border-zinc-800">
+          <span className="text-zinc-500">{row.label}</span>
+          <span className="text-zinc-300 text-right max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap">
+            {row.value}
+          </span>
         </div>
-      )}
-      <div className="editor-meta-row">
-        <span className="editor-meta-label">Size</span>
-        <span className="editor-meta-value">
-          {Math.round(rect.width)} x {Math.round(rect.height)}
-        </span>
-      </div>
-      <div className="editor-meta-row">
-        <span className="editor-meta-label">Position</span>
-        <span className="editor-meta-value">{computedStyle.position}</span>
-      </div>
-      <div className="editor-meta-row">
-        <span className="editor-meta-label">Display</span>
-        <span className="editor-meta-value">{computedStyle.display}</span>
-      </div>
-      <div className="editor-meta-row">
-        <span className="editor-meta-label">Font</span>
-        <span className="editor-meta-value">
-          {computedStyle.fontSize} / {computedStyle.fontWeight}
-        </span>
-      </div>
-      <div className="editor-meta-row">
-        <span className="editor-meta-label">Color</span>
-        <span className="editor-meta-value">{computedStyle.color}</span>
-      </div>
+      ))}
 
       {sourceLocation && (
-        <div className="editor-selector-display" style={{ marginBottom: 4 }}>
-          <span style={{ color: "#71717a" }}>Source:</span>
+        <div className="mt-2 px-2 py-1.5 bg-zinc-800 rounded text-[10px] text-zinc-400 break-all leading-[1.5] mb-1">
+          <span className="text-zinc-500">Source:</span>
           <br />
-          <span style={{ color: "#4ade80" }}>
+          <span className="text-green-500">
             {sourceLocation.fileName}:{sourceLocation.lineNumber}:{sourceLocation.columnNumber}
           </span>
         </div>
       )}
 
-      <div className="editor-selector-display">
-        <span style={{ color: "#71717a" }}>Selector:</span>
+      <div className="mt-2 px-2 py-1.5 bg-zinc-800 rounded text-[10px] text-zinc-400 break-all leading-[1.5]">
+        <span className="text-zinc-500">Selector:</span>
         <br />
         {selector}
       </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import type { ComponentPropInfo } from "../engine/fiber";
 
 export interface PropChange {
@@ -32,6 +33,9 @@ function formatReadOnly(value: unknown, type: string): string {
   return String(value).slice(0, 60);
 }
 
+const inputCls =
+  "flex-1 rounded px-1.5 py-1 text-[11px] bg-zinc-800 text-zinc-300 border border-zinc-700 outline-none focus:border-zinc-300 font-[inherit] min-w-0";
+
 export default function PropsEditor({
   componentStack,
   selectedIndex,
@@ -49,13 +53,16 @@ export default function PropsEditor({
 
   return (
     <div>
-      {/* Component selector — show when multiple components in chain */}
+      {/* Component selector */}
       {componentStack.length > 1 && (
-        <div className="editor-component-selector">
+        <div className="flex flex-wrap gap-1 mb-2.5">
           {componentStack.map((comp, i) => (
             <button
               key={i}
-              className={`editor-component-pill${i === selectedIndex ? " editor-component-pill--active" : ""}`}
+              className={cn(
+                "bg-zinc-800 text-zinc-400 border border-transparent rounded px-2 py-px text-[10px] cursor-pointer transition-all hover:text-white",
+                i === selectedIndex && "bg-white text-black"
+              )}
               onClick={() => onSelectComponent(i)}
             >
               {comp.componentName}
@@ -64,12 +71,12 @@ export default function PropsEditor({
         </div>
       )}
 
-      <div style={{ color: "#d4d4d8", fontSize: 11, marginBottom: 10, fontWeight: 600, fontFamily: "monospace" }}>
+      <div className="text-zinc-300 text-[11px] mb-2.5 font-semibold font-mono">
         &lt;{componentName} /&gt;
       </div>
 
       {editable.length === 0 ? (
-        <div style={{ color: "#fbbf24", fontSize: 10 }}>
+        <div className="text-amber-400 text-[10px]">
           No editable props (all complex types)
         </div>
       ) : (
@@ -81,12 +88,17 @@ export default function PropsEditor({
           return (
             <div
               key={propName}
-              className={`editor-prop-row${isChanged ? " editor-prop-row--changed" : ""}`}
+              className={cn(
+                "flex gap-1.5 mb-1.5 items-center pl-1.5 border-l-2 border-transparent",
+                isChanged && "border-l-green-400"
+              )}
             >
-              <span className="editor-prop-label">{propName}</span>
+              <span className="text-zinc-400 text-[11px] min-w-[70px] shrink-0">
+                {propName}
+              </span>
               {info.type === "boolean" ? (
                 <input
-                  className="editor-prop-toggle"
+                  className="w-4 h-4 accent-zinc-300 cursor-pointer"
                   type="checkbox"
                   checked={currentValue as boolean}
                   onChange={(e) =>
@@ -95,20 +107,16 @@ export default function PropsEditor({
                 />
               ) : info.type === "number" ? (
                 <input
-                  className="editor-prop-input"
+                  className={inputCls}
                   type="number"
                   value={currentValue as number}
                   onChange={(e) =>
-                    onChangeProp(
-                      propName,
-                      parseFloat(e.target.value) || 0,
-                      info.value as number
-                    )
+                    onChangeProp(propName, parseFloat(e.target.value) || 0, info.value as number)
                   }
                 />
               ) : (
                 <input
-                  className="editor-prop-input"
+                  className={inputCls}
                   type="text"
                   value={currentValue as string}
                   onChange={(e) =>
@@ -118,11 +126,11 @@ export default function PropsEditor({
               )}
               {isChanged && (
                 <button
-                  className="editor-style-delete"
+                  className="bg-transparent border-none cursor-pointer p-0 text-zinc-500 text-[14px] px-1 hover:text-rose-400"
                   onClick={() => onResetProp(propName)}
                   title="Reset"
                 >
-                  x
+                  ×
                 </button>
               )}
             </div>
@@ -131,12 +139,12 @@ export default function PropsEditor({
       )}
 
       {readOnly.length > 0 && (
-        <div className="editor-prop-readonly">
-          <div style={{ fontSize: 10, marginBottom: 6 }}>Read-only</div>
+        <div className="text-zinc-500 mt-3 border-t border-zinc-800 pt-2">
+          <div className="text-[10px] mb-1.5">Read-only</div>
           {readOnly.map(([propName, info]) => (
-            <div key={propName} className="editor-meta-row">
-              <span className="editor-meta-label">{propName}</span>
-              <span className="editor-meta-value" style={{ fontSize: 10 }}>
+            <div key={propName} className="flex justify-between py-1 border-b border-zinc-800">
+              <span className="text-zinc-500">{propName}</span>
+              <span className="text-zinc-300 text-right text-[10px] max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap">
                 {formatReadOnly(info.value, info.type)}
               </span>
             </div>
@@ -144,7 +152,7 @@ export default function PropsEditor({
         </div>
       )}
 
-      <div style={{ color: "#71717a", fontSize: 9, marginTop: 10 }}>
+      <div className="text-zinc-500 text-[9px] mt-2.5">
         Props apply on commit
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { EDITOR_ATTR } from "./constants";
 import { useEditor } from "./EditorProvider";
 import {
@@ -23,24 +24,16 @@ function generateId(): string {
 /** Lightweight markdown → HTML for thread messages. */
 function renderMd(text: string): string {
   return text
-    // code blocks (``` ... ```)
-    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-    // inline code
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // bold
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // italic
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // bullet lists (lines starting with - or *)
-    .replace(/^[\-\*] (.+)$/gm, '<li>$1</li>')
-    .replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>')
-    // numbered lists
-    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-    .replace(/((?:<li>.*<\/li>\n?)+)/g, (m) => m.includes('<ul>') ? m : `<ol>${m}</ol>`)
-    // paragraphs (double newline)
-    .replace(/\n{2,}/g, '</p><p>')
-    // single newlines → <br>
-    .replace(/\n/g, '<br>');
+    .replace(/```(\w*)\n([\s\S]*?)```/g, "<pre><code>$2</code></pre>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/^[\-\*] (.+)$/gm, "<li>$1</li>")
+    .replace(/((?:<li>.*<\/li>\n?)+)/g, "<ul>$1</ul>")
+    .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
+    .replace(/((?:<li>.*<\/li>\n?)+)/g, (m) => m.includes("<ul>") ? m : `<ol>${m}</ol>`)
+    .replace(/\n{2,}/g, "</p><p>")
+    .replace(/\n/g, "<br>");
 }
 
 function isElementFixed(element: HTMLElement): boolean {
@@ -92,6 +85,13 @@ const INTENT_OPTIONS: { value: AnnotationIntent; label: string }[] = [
   { value: "approve", label: "Approve" },
 ];
 
+// Shared class fragments
+const textareaBase =
+  "w-full bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-md text-[12px] outline-none p-2 resize-y box-border focus:border-zinc-300 font-[inherit]";
+
+const btnBase =
+  "border-none rounded-md cursor-pointer font-[inherit] text-[12px] transition-colors disabled:opacity-40 disabled:cursor-default";
+
 export default function AnnotationOverlay() {
   const editor = useEditor();
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
@@ -125,8 +125,7 @@ export default function AnnotationOverlay() {
     let throttleTimer: ReturnType<typeof setTimeout> | null = null;
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (pending) return; // Don't hover while popup is open
-
+      if (pending) return;
       const target = e.target as HTMLElement;
       if (!target || isEditorElement(target)) {
         setHoverInfo(null);
@@ -171,11 +170,9 @@ export default function AnnotationOverlay() {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target || isEditorElement(target)) return;
-
       e.preventDefault();
       e.stopPropagation();
 
-      // Block new annotation while popup is open — wiggle instead
       if (pendingRef.current) {
         setWiggle(true);
         setTimeout(() => setWiggle(false), 400);
@@ -230,27 +227,21 @@ export default function AnnotationOverlay() {
     };
   }, [editor?.annotateMode, editor?.outputDetailLevel, isEditorElement]);
 
-  // Focus textarea when popup opens
   useEffect(() => {
-    if (pending && textareaRef.current) {
-      textareaRef.current.focus();
-    }
+    if (pending && textareaRef.current) textareaRef.current.focus();
   }, [pending]);
 
   useEffect(() => {
-    if (editingId && editTextareaRef.current) {
-      editTextareaRef.current.focus();
-    }
+    if (editingId && editTextareaRef.current) editTextareaRef.current.focus();
   }, [editingId]);
 
-  // Auto-scroll thread when new messages arrive
   useEffect(() => {
     if (editingId && threadEndRef.current) {
-      threadEndRef.current.scrollIntoView({ behavior: "smooth" });
+      // Scroll within the thread container only, not the page
+      threadEndRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [editingId, editor?.annotations]);
 
-  // Escape to close popup
   useEffect(() => {
     if (!pending && !editingId) return;
     const handler = (e: KeyboardEvent) => {
@@ -265,7 +256,6 @@ export default function AnnotationOverlay() {
 
   const submitAnnotation = useCallback(() => {
     if (!pending || !comment.trim() || !editor) return;
-
     const annotation: Annotation = {
       id: generateId(),
       x: pending.x,
@@ -288,10 +278,12 @@ export default function AnnotationOverlay() {
       severity: "suggestion",
       status: "pending",
     };
-
     editor.addAnnotation(annotation);
     setPending(null);
     setComment("");
+    setEditingId(annotation.id);
+    setEditComment(annotation.comment);
+    setIsEditingComment(false);
   }, [pending, comment, intent, editor]);
 
   const submitEdit = useCallback(() => {
@@ -309,18 +301,14 @@ export default function AnnotationOverlay() {
 
   if (!editor) return null;
 
-  // Compute popup position (centered horizontally near click, above or below)
   const popupStyle = pending
     ? (() => {
         const popupWidth = 360;
         const popupHeight = 220;
         let left = (pending.x / 100) * window.innerWidth - popupWidth / 2;
         left = Math.max(8, Math.min(left, window.innerWidth - popupWidth - 8));
-        // Place above click point if enough room, otherwise below (document-relative)
         const spaceAbove = pending.clientY;
-        const top = spaceAbove > popupHeight + 20
-          ? pending.y - popupHeight - 12
-          : pending.y + 16;
+        const top = spaceAbove > popupHeight + 20 ? pending.y - popupHeight - 12 : pending.y + 16;
         return { left, top, width: popupWidth };
       })()
     : null;
@@ -329,20 +317,35 @@ export default function AnnotationOverlay() {
     (a) => a.status !== "resolved" && a.status !== "dismissed"
   );
 
+  // Status badge styles
+  const statusStyles: Record<string, string> = {
+    pending: "bg-amber-400/20 text-amber-400",
+    acknowledged: "bg-blue-500/20 text-blue-500",
+    resolved: "bg-green-500/20 text-green-500",
+    dismissed: "bg-zinc-500/20 text-zinc-500",
+  };
+
+  // Marker color styles
+  const markerStyles: Record<string, string> = {
+    acknowledged: "bg-blue-500 shadow-[0_2px_8px_rgba(59,130,246,0.4)] hover:shadow-[0_3px_12px_rgba(59,130,246,0.6)]",
+    resolved: "bg-green-500 shadow-[0_2px_8px_rgba(34,197,94,0.4)] hover:shadow-[0_3px_12px_rgba(34,197,94,0.6)]",
+    dismissed: "bg-zinc-500 shadow-[0_2px_8px_rgba(113,113,122,0.3)] opacity-60",
+  };
+
   return (
     <>
       {/* Annotate mode banner */}
       {editor.annotateMode && (
-        <div className="editor-annotate-banner">
+        <div className="fixed top-0 right-0 flex items-center justify-center px-3 py-1 m-1 z-[9990] bg-zinc-900/90 text-zinc-100 text-center max-w-max text-[11px] rounded pointer-events-none">
           ANNOTATE MODE — click any element to add feedback
         </div>
       )}
 
-      {/* Hover highlight (while browsing, before click) */}
+      {/* Hover highlight */}
       {editor.annotateMode && hoverInfo?.rect && !pending && (
         <>
           <div
-            className="editor-annotate-highlight"
+            className="pointer-events-none z-[9988] border-2 border-dashed border-amber-400/60 rounded-[3px] bg-amber-400/[0.04] transition-all duration-[25ms]"
             style={{
               position: "absolute",
               top: hoverInfo.rect.top,
@@ -352,7 +355,7 @@ export default function AnnotationOverlay() {
             }}
           />
           <div
-            className="editor-annotate-tooltip"
+            className="z-[9989] bg-zinc-900/85 text-zinc-100 text-[12px] px-2 py-px rounded-[3px] pointer-events-none whitespace-nowrap max-w-[320px] overflow-hidden text-ellipsis leading-[1.5]"
             style={{
               position: "absolute",
               top: hoverInfo.rect.top >= 28 ? hoverInfo.rect.top - 26 : hoverInfo.rect.bottom + 4,
@@ -364,11 +367,11 @@ export default function AnnotationOverlay() {
         </>
       )}
 
-      {/* Persistent highlight of clicked element while popup is open */}
+      {/* Persistent highlight while popup is open */}
       {pending?.boundingBox && (
         <>
           <div
-            className="editor-annotate-highlight editor-annotate-highlight--active"
+            className="pointer-events-none z-[9988] border-2 border-solid border-amber-400/80 rounded-[3px] bg-amber-400/[0.08] transition-all duration-[25ms]"
             style={{
               position: "absolute",
               top: pending.boundingBox.y,
@@ -378,7 +381,7 @@ export default function AnnotationOverlay() {
             }}
           />
           <div
-            className="editor-annotate-tooltip editor-annotate-tooltip--active"
+            className="z-[9989] bg-zinc-900/95 text-zinc-100 font-semibold text-[12px] px-2 py-px rounded-[3px] pointer-events-none whitespace-nowrap max-w-[320px] overflow-hidden text-ellipsis leading-[1.5]"
             style={{
               position: "absolute",
               top: pending.boundingBox.y >= 28
@@ -397,7 +400,15 @@ export default function AnnotationOverlay() {
         renderableAnnotations.map((a, i) => (
           <div
             key={a.id}
-            className={`editor-annotation-marker${editingId === a.id ? " editor-annotation-marker--editing" : ""}${a.status && a.status !== "pending" ? ` editor-annotation-marker--${a.status}` : ""}`}
+            className={cn(
+              "z-[9991] w-[22px] h-[22px] rounded-full text-[11px] font-semibold flex items-center justify-center cursor-pointer -translate-x-1/2 -translate-y-1/2 transition-all select-none",
+              // default: amber
+              "bg-amber-400 text-zinc-900 shadow-[0_2px_8px_rgba(245,158,11,0.4)] hover:scale-[1.2] hover:shadow-[0_3px_12px_rgba(245,158,11,0.6)]",
+              // status override
+              a.status && a.status !== "pending" && markerStyles[a.status],
+              // editing state
+              editingId === a.id && "scale-[1.25] bg-amber-600 shadow-[0_3px_12px_rgba(245,158,11,0.7)]"
+            )}
             style={{
               left: `${a.x}%`,
               top: a.isFixed ? a.y - window.scrollY : a.y,
@@ -433,14 +444,19 @@ export default function AnnotationOverlay() {
         const top = markerY + 28;
         const statusLabel = ann.status || "pending";
         return (
-          <div className="editor-annotation-popup" style={{ left, top, width: popW }}>
-            <div className="editor-annotation-popup-header">
-              <span className="editor-annotation-popup-element">{ann.element}</span>
-              <span className={`editor-annotation-status editor-annotation-status--${statusLabel}`}>
+          <div
+            className="absolute z-[9996] bg-zinc-900 border border-zinc-700 rounded-[10px] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-[12px] text-zinc-300 max-h-[600px] overflow-y-auto"
+            style={{ left, top, width: popW }}
+          >
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-zinc-200 font-semibold text-[12px] overflow-hidden text-ellipsis whitespace-nowrap max-w-[200px]">
+                {ann.element}
+              </span>
+              <span className={cn("text-[9px] uppercase tracking-[0.5px] px-[6px] py-px rounded-[3px] shrink-0", statusStyles[statusLabel])}>
                 {statusLabel}
               </span>
               <button
-                className="editor-annotation-popup-delete"
+                className="bg-transparent border-none cursor-pointer p-0 text-rose-400 text-[11px] opacity-70 hover:opacity-100"
                 onClick={() => {
                   editor.removeAnnotation(ann.id);
                   setEditingId(null);
@@ -449,11 +465,12 @@ export default function AnnotationOverlay() {
                 Delete
               </button>
             </div>
+
             {isEditingComment ? (
               <>
                 <textarea
                   ref={editTextareaRef}
-                  className="editor-annotation-textarea"
+                  className={cn(textareaBase, "min-h-[52px]")}
                   value={editComment}
                   onChange={(e) => setEditComment(e.target.value)}
                   onKeyDown={(e) => {
@@ -466,10 +483,9 @@ export default function AnnotationOverlay() {
                   rows={2}
                   placeholder="Edit feedback..."
                 />
-                <div className="editor-annotation-popup-actions">
+                <div className="flex justify-end gap-2 mt-2">
                   <button
-                    className="editor-btn"
-                    style={{ opacity: 0.6 }}
+                    className={cn(btnBase, "px-3 py-1 bg-zinc-700 text-zinc-300 opacity-60 hover:opacity-100")}
                     onClick={() => {
                       setEditComment(ann.comment);
                       setIsEditingComment(false);
@@ -478,7 +494,7 @@ export default function AnnotationOverlay() {
                     Cancel
                   </button>
                   <button
-                    className="editor-btn editor-btn--primary"
+                    className={cn(btnBase, "px-3 py-1 bg-zinc-300 text-zinc-900 hover:bg-zinc-200")}
                     onClick={() => {
                       submitEdit();
                       setIsEditingComment(false);
@@ -490,10 +506,12 @@ export default function AnnotationOverlay() {
                 </div>
               </>
             ) : (
-              <div className="editor-annotation-comment-row">
-                <div className="editor-annotation-comment-text">{ann.comment}</div>
+              <div className="flex items-start gap-2 mb-2">
+                <div className="flex-1 text-zinc-200 text-[12px] leading-[1.4] whitespace-pre-wrap break-words">
+                  {ann.comment}
+                </div>
                 <button
-                  className="editor-annotation-comment-edit"
+                  className="bg-transparent border-none cursor-pointer text-zinc-500 text-[10px] p-0 shrink-0 hover:text-zinc-200"
                   onClick={() => {
                     setEditComment(ann.comment);
                     setIsEditingComment(true);
@@ -504,30 +522,62 @@ export default function AnnotationOverlay() {
               </div>
             )}
 
+            {/* Working indicator for fresh annotations (no thread yet) */}
+            {!hasThread && ann.status === "acknowledged" && (
+              <div className="border-t border-zinc-700 mt-2 pt-1.5">
+                <div className="px-2 py-1 rounded-md text-[12px] leading-[1.4] bg-zinc-400/10 opacity-70 flex items-center">
+                  <span className="text-[9px] font-semibold uppercase tracking-[0.3px] mr-1.5 text-blue-500">
+                    Claude
+                  </span>
+                  <span className="text-zinc-300 leading-[1.5]">working</span>
+                  <span className="inline-flex items-center gap-1 ml-0.5">
+                    <span className="editor-thinking-dot" />
+                    <span className="editor-thinking-dot" />
+                    <span className="editor-thinking-dot" />
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Thread messages */}
             {hasThread && (
-              <div className="editor-annotation-thread">
-                <div className="editor-annotation-thread-label">Thread</div>
-                <div className="editor-annotation-thread-messages">
+              <div className="border-t border-zinc-700 mt-2 pt-1.5">
+                <div className="text-zinc-500 text-[10px] uppercase tracking-[0.5px] mb-1.5">
+                  Thread
+                </div>
+                <div className="max-h-[460px] overflow-y-auto flex flex-col gap-1">
                   {ann.thread!.map((msg, i) => (
                     <div
                       key={i}
-                      className={`editor-annotation-thread-msg editor-annotation-thread-msg--${msg.role}`}
+                      className={cn(
+                        "px-2 py-1 rounded-md text-[12px] leading-[1.4]",
+                        msg.role === "user" ? "bg-zinc-800" : "bg-zinc-400/10"
+                      )}
                     >
-                      <span className="editor-annotation-thread-role">
+                      <span
+                        className={cn(
+                          "text-[9px] font-semibold uppercase tracking-[0.3px] mr-1.5",
+                          msg.role === "user" ? "text-zinc-400" : "text-blue-500"
+                        )}
+                      >
                         {msg.role === "agent" ? "Claude" : "You"}
                       </span>
-                      <span className="editor-annotation-thread-content" dangerouslySetInnerHTML={{ __html: renderMd(msg.content) }} />
+                      <span
+                        className="editor-thread-content text-zinc-300 leading-[1.5]"
+                        dangerouslySetInnerHTML={{ __html: renderMd(msg.content) }}
+                      />
                     </div>
                   ))}
                   {ann.thread!.length > 0
                     && ann.thread![ann.thread!.length - 1].role === "user"
                     && ann.status !== "resolved"
                     && ann.status !== "dismissed" && (
-                    <div className="editor-annotation-thread-msg editor-annotation-thread-msg--agent editor-annotation-thinking">
-                      <span className="editor-annotation-thread-role">Claude</span>
-                      <span className="editor-annotation-thread-content">thinking</span>
-                      <span className="editor-thinking-dots">
+                    <div className="px-2 py-1 rounded-md text-[12px] leading-[1.4] bg-zinc-400/10 opacity-70 flex items-center">
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.3px] mr-1.5 text-blue-500">
+                        Claude
+                      </span>
+                      <span className="text-zinc-300 leading-[1.5]">thinking</span>
+                      <span className="inline-flex items-center gap-1 ml-0.5">
                         <span className="editor-thinking-dot" />
                         <span className="editor-thinking-dot" />
                         <span className="editor-thinking-dot" />
@@ -540,9 +590,9 @@ export default function AnnotationOverlay() {
             )}
 
             {/* Reply input */}
-            <div className="editor-annotation-reply">
+            <div className="flex gap-1 items-stretch mt-1.5">
               <textarea
-                className="editor-annotation-textarea editor-annotation-textarea--reply"
+                className={cn(textareaBase, "min-h-[28px] text-[11px] py-1 resize-none flex-1")}
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 onKeyDown={(e) => {
@@ -555,7 +605,7 @@ export default function AnnotationOverlay() {
                 placeholder="Reply..."
               />
               <button
-                className="editor-btn editor-btn--small"
+                className="shrink-0 px-2.5 py-1 text-[10px] bg-zinc-700 text-zinc-300 border-none rounded hover:bg-zinc-600 disabled:opacity-40 disabled:cursor-default cursor-pointer font-[inherit]"
                 onClick={submitReply}
                 disabled={!replyText.trim()}
               >
@@ -568,22 +618,34 @@ export default function AnnotationOverlay() {
 
       {/* New annotation popup */}
       {pending && popupStyle && (
-        <div className={`editor-annotation-popup${wiggle ? " editor-annotation-popup--wiggle" : ""}`} style={popupStyle}>
-          <div className="editor-annotation-popup-header">
-            <span className="editor-annotation-popup-element">{pending.element}</span>
+        <div
+          className={cn(
+            "absolute z-[9996] bg-zinc-900 border border-zinc-700 rounded-[10px] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-[12px] text-zinc-300 max-h-[600px] overflow-y-auto",
+            wiggle && "editor-annotation-popup--wiggle"
+          )}
+          style={popupStyle}
+        >
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <span className="text-zinc-200 font-semibold text-[12px] overflow-hidden text-ellipsis whitespace-nowrap max-w-[200px]">
+              {pending.element}
+            </span>
             {pending.sourceFile && (
-              <span className="editor-annotation-popup-source">{pending.sourceFile}</span>
+              <span className="text-zinc-500 text-[10px] overflow-hidden text-ellipsis whitespace-nowrap">
+                {pending.sourceFile}
+              </span>
             )}
           </div>
+
           {pending.selectedText && (
-            <div className="editor-annotation-popup-selection">
+            <div className="bg-zinc-800 px-2 py-1 rounded text-[11px] text-zinc-400 mb-2 italic overflow-hidden text-ellipsis whitespace-nowrap">
               &ldquo;{pending.selectedText.slice(0, 60)}
               {pending.selectedText.length > 60 ? "..." : ""}&rdquo;
             </div>
           )}
+
           <textarea
             ref={textareaRef}
-            className="editor-annotation-textarea"
+            className={cn(textareaBase, "min-h-[52px]")}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             onKeyDown={(e) => {
@@ -595,31 +657,36 @@ export default function AnnotationOverlay() {
             rows={3}
             placeholder="Describe the issue or feedback..."
           />
-          <div className="editor-annotation-popup-intents">
+
+          {/* Intent pills */}
+          <div className="flex gap-1 my-2">
             {INTENT_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
-                className={`editor-intent-pill${intent === opt.value ? " editor-intent-pill--active" : ""}`}
+                className={cn(
+                  "bg-zinc-800 text-zinc-400 border border-transparent rounded px-2 py-px text-[10px] cursor-pointer transition-all hover:text-white",
+                  intent === opt.value && "bg-white text-black"
+                )}
                 onClick={() => setIntent(opt.value)}
               >
                 {opt.label}
               </button>
             ))}
           </div>
-          <div className="editor-annotation-popup-actions">
+
+          <div className="flex justify-end gap-2 mt-2">
             <button
-              className="editor-btn"
-              style={{ opacity: 0.6 }}
+              className={cn(btnBase, "px-3 py-1 bg-zinc-700 text-zinc-300 opacity-60 hover:opacity-100")}
               onClick={() => setPending(null)}
             >
               Cancel
             </button>
             <button
-              className="editor-btn editor-btn--primary"
+              className={cn(btnBase, "px-3 py-1 bg-zinc-300 text-zinc-900 hover:bg-zinc-200")}
               onClick={submitAnnotation}
               disabled={!comment.trim()}
             >
-              Add ({navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}+{"\u21B5"})
+              Add ({navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}+{"↵"})
             </button>
           </div>
         </div>

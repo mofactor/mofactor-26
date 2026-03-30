@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "editor-annotations": {
+      "command": "npx",
+      "args": ["tsx", "src/editor/server/index.ts", "--mcp-only"],
+      "cwd": "/Users/onuroztaskiran/FE Apps/tt6/mofactor-26"
+    }
+  }
+}

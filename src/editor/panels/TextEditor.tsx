@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface TextEditorProps {
   element: HTMLElement;
@@ -19,7 +20,6 @@ export default function TextEditor({
 
   const hasChildren = element.childElementCount > 0;
 
-  // Reset text when element changes
   useEffect(() => {
     setText(element.textContent ?? "");
   }, [element]);
@@ -52,12 +52,12 @@ export default function TextEditor({
   if (!hasChildren) {
     return (
       <div>
-        <div style={{ color: "#a1a1aa", fontSize: 11, marginBottom: 8 }}>
+        <div className="text-zinc-400 text-[11px] mb-2">
           Type directly on the element
         </div>
         {changed && (
-          <div style={{ fontSize: 10, color: "#71717a" }}>
-            <span style={{ color: "#fb7185", textDecoration: "line-through" }}>
+          <div className="text-[10px] text-zinc-500">
+            <span className="text-rose-400 line-through">
               {originalText.length > 120
                 ? originalText.slice(0, 120) + "..."
                 : originalText}
@@ -71,12 +71,11 @@ export default function TextEditor({
   // Complex element with children → textarea fallback
   return (
     <div>
-      <div style={{ color: "#fbbf24", fontSize: 10, marginBottom: 8 }}>
-        This element has child elements. Text editing will only affect leaf text
-        nodes.
+      <div className="text-amber-400 text-[10px] mb-2">
+        This element has child elements. Text editing will only affect leaf text nodes.
       </div>
       <textarea
-        className="editor-textarea"
+        className="w-full min-h-[60px] p-2 resize-y bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-md text-[12px] outline-none focus:border-zinc-300 font-[inherit]"
         value={text}
         onChange={(e) => {
           setText(e.target.value);
@@ -86,8 +85,8 @@ export default function TextEditor({
         spellCheck={false}
       />
       {changed && (
-        <div style={{ marginTop: 6, fontSize: 10, color: "#71717a" }}>
-          <span style={{ color: "#fb7185", textDecoration: "line-through" }}>
+        <div className="mt-1.5 text-[10px] text-zinc-500">
+          <span className="text-rose-400 line-through">
             {originalText.length > 80
               ? originalText.slice(0, 80) + "..."
               : originalText}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface StyleRow {
   property: string;
@@ -23,6 +24,9 @@ function parseInlineStyles(el: HTMLElement): StyleRow[] {
   return rows;
 }
 
+const inputCls =
+  "flex-1 rounded px-1.5 py-1 text-[11px] bg-zinc-800 text-zinc-300 border border-zinc-700 outline-none focus:border-zinc-300 font-[inherit] min-w-0";
+
 export default function StyleEditor({
   element,
   onSetStyle,
@@ -37,7 +41,6 @@ export default function StyleEditor({
       setRows((prev) => {
         const next = [...prev];
         next[idx] = { ...next[idx], [field]: val };
-        // Apply live if both fields are filled
         if (next[idx].property && next[idx].value) {
           onSetStyle(next[idx].property, next[idx].value);
         }
@@ -50,9 +53,7 @@ export default function StyleEditor({
   const removeRow = useCallback(
     (idx: number) => {
       const row = rows[idx];
-      if (row.property) {
-        onRemoveStyle(row.property);
-      }
+      if (row.property) onRemoveStyle(row.property);
       setRows((prev) => prev.filter((_, i) => i !== idx));
     },
     [rows, onRemoveStyle]
@@ -72,37 +73,44 @@ export default function StyleEditor({
   return (
     <div>
       {rows.map((row, i) => (
-        <div key={i} className="editor-style-row">
+        <div key={i} className="flex gap-1 mb-1 items-center">
           <input
+            className={inputCls}
             value={row.property}
             onChange={(e) => updateRow(i, "property", e.target.value)}
             placeholder="property"
             spellCheck={false}
           />
-          <span style={{ color: "#71717a" }}>:</span>
+          <span className="text-zinc-500 shrink-0">:</span>
           <input
+            className={inputCls}
             value={row.value}
             onChange={(e) => updateRow(i, "value", e.target.value)}
             placeholder="value"
             spellCheck={false}
           />
-          <button className="editor-style-delete" onClick={() => removeRow(i)}>
-            x
+          <button
+            className="bg-transparent border-none cursor-pointer p-0 text-zinc-500 text-[14px] px-1 hover:text-rose-400"
+            onClick={() => removeRow(i)}
+          >
+            ×
           </button>
         </div>
       ))}
 
       {/* Add new style row */}
-      <div className="editor-style-row" style={{ marginTop: 8 }}>
+      <div className="flex gap-1 mt-2 items-center">
         <input
+          className={inputCls}
           value={newProp}
           onChange={(e) => setNewProp(e.target.value)}
           placeholder="property"
           spellCheck={false}
           onKeyDown={(e) => e.key === "Enter" && addRow()}
         />
-        <span style={{ color: "#71717a" }}>:</span>
+        <span className="text-zinc-500 shrink-0">:</span>
         <input
+          className={inputCls}
           value={newVal}
           onChange={(e) => setNewVal(e.target.value)}
           placeholder="value"
@@ -110,9 +118,8 @@ export default function StyleEditor({
           onKeyDown={(e) => e.key === "Enter" && addRow()}
         />
         <button
-          className="editor-style-delete"
+          className="bg-transparent border-none cursor-pointer p-0 text-green-500 text-[14px] px-1 hover:text-green-400"
           onClick={addRow}
-          style={{ color: "#4ade80" }}
         >
           +
         </button>

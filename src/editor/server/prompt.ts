@@ -43,7 +43,7 @@ export function buildAgentPrompt(annotation: ServerAnnotation): string {
   parts.push(`2. Implement the requested change. This is a ${annotation.intent || "fix"} request.`);
   parts.push(`3. Make minimal, focused changes. Do not refactor unrelated code.`);
   parts.push(`4. This project uses Tailwind CSS v4 for styling and Next.js App Router.`);
-  parts.push(`5. After completing the change, commit your work with a clear commit message.`);
+  parts.push(`5. Do NOT commit, push, or run any git commands. Just edit the file and stop.`);
 
   if (annotation.thread && annotation.thread.length > 0) {
     parts.push(``);
@@ -84,7 +84,7 @@ export function buildFollowUpPrompt(
   parts.push(`## Instructions`);
   parts.push(`1. Review the user's new message and the thread history.`);
   parts.push(`2. Make any requested changes or answer any questions.`);
-  parts.push(`3. Commit your changes with a clear message.`);
+  parts.push(`3. Do NOT commit, push, or run any git commands. Just edit the file and stop.`);
 
   return parts.join("\n");
 }

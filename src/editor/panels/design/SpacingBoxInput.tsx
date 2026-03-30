@@ -1,15 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { SPACING_TOKENS, TOKEN_TO_CSS, isSpacingToken } from "../../tailwind/spacing-map";
 
 export type SpacingMode = "collapsed" | "expanded";
 
 interface SpacingBoxInputProps {
   label: string;
-  /** Values in collapsed mode: x (horizontal) and y (vertical) */
   valuesAxis: { x: string; y: string };
-  /** Values in expanded mode: individual sides */
   valuesSides: { top: string; right: string; bottom: string; left: string };
   mode: SpacingMode;
   onToggleMode: () => void;
@@ -17,7 +16,7 @@ interface SpacingBoxInputProps {
   onChangeSide: (side: "top" | "right" | "bottom" | "left", value: string) => void;
 }
 
-// ── Preset suggestions for the dropdown ──
+// ── Preset suggestions ──
 
 interface SpacingSuggestion {
   token: string;
@@ -37,7 +36,7 @@ function filterSuggestions(query: string): SpacingSuggestion[] {
   );
 }
 
-// ── SVG icons matching Figma's padding input icons ──
+// ── SVG icons ──
 
 const IconPaddingY = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -122,20 +121,15 @@ function SpacingInput({
   const [showDropdown, setShowDropdown] = useState(false);
   const [focusedIdx, setFocusedIdx] = useState(-1);
 
-  // Filtered suggestions based on what the user is typing
   const suggestions = editing ? filterSuggestions(localValue) : [];
 
-  // Commit the current local value
   const commit = useCallback(
     (val: string) => {
       const trimmed = val.trim();
       setEditing(false);
       setShowDropdown(false);
       setFocusedIdx(-1);
-      // Only commit if value actually changed
-      if (trimmed !== value) {
-        onChange(trimmed);
-      }
+      if (trimmed !== value) onChange(trimmed);
     },
     [onChange, value]
   );
@@ -148,7 +142,6 @@ function SpacingInput({
   }, [value]);
 
   const handleBlur = useCallback(() => {
-    // Small delay to allow dropdown click to register
     setTimeout(() => {
       if (!dropdownRef.current?.contains(document.activeElement)) {
         commit(localValue);
@@ -188,7 +181,6 @@ function SpacingInput({
     [commit]
   );
 
-  // Scroll focused item into view
   useEffect(() => {
     if (focusedIdx >= 0 && dropdownRef.current) {
       const items = dropdownRef.current.children;
@@ -200,12 +192,16 @@ function SpacingInput({
   const cssHint = !editing && value && isSpacingToken(value) ? TOKEN_TO_CSS[value] : undefined;
 
   return (
-    <div className="editor-spacing-field-wrap">
-      <div className="editor-spacing-field" title={title}>
-        <span className="editor-spacing-icon">{icon}</span>
+    <div className="flex-1 relative min-w-0">
+      {/* Field wrapper */}
+      <div
+        className="flex items-center gap-1 bg-zinc-800 border border-zinc-700 rounded-md px-1.5 py-[5px] min-w-0 focus-within:border-zinc-300"
+        title={title}
+      >
+        <span className="text-zinc-500 shrink-0 flex items-center">{icon}</span>
         <input
           ref={inputRef}
-          className="editor-spacing-input"
+          className="bg-transparent border-none text-zinc-100 text-[12px] w-full min-w-0 outline-none p-0 caret-zinc-100 placeholder:text-zinc-500 font-[inherit]"
           type="text"
           value={displayValue}
           placeholder="0"
@@ -221,38 +217,57 @@ function SpacingInput({
           spellCheck={false}
           autoComplete="off"
         />
-        {cssHint && <span className="editor-spacing-hint">{cssHint}</span>}
+        {cssHint && (
+          <span className="text-zinc-500 text-[9px] shrink-0 whitespace-nowrap">{cssHint}</span>
+        )}
       </div>
 
-      {/* Dropdown with TW preset values */}
+      {/* Dropdown */}
       {showDropdown && editing && suggestions.length > 0 && (
-        <div className="editor-spacing-dropdown" ref={dropdownRef}>
+        <div
+          className="absolute top-[calc(100%+2px)] left-0 right-0 z-10 max-h-[180px] overflow-y-auto bg-zinc-900 border border-zinc-700 rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+          ref={dropdownRef}
+        >
           {suggestions.slice(0, 20).map((s, i) => (
             <div
               key={s.token}
-              className={`editor-spacing-dropdown-item ${i === focusedIdx ? "editor-spacing-dropdown-item--focused" : ""}`}
+              className={cn(
+                "flex justify-between items-center px-2 py-1 cursor-pointer gap-1.5 hover:bg-zinc-700",
+                i === focusedIdx && "bg-zinc-700"
+              )}
               onMouseDown={(e) => {
-                e.preventDefault(); // prevent blur
+                e.preventDefault();
                 handleSelectSuggestion(s.token);
               }}
               onMouseEnter={() => setFocusedIdx(i)}
             >
-              <span className="editor-spacing-dropdown-token">{s.token}</span>
-              <span className="editor-spacing-dropdown-css">{s.css}</span>
+              <span className="text-zinc-100 text-[11px] font-medium">{s.token}</span>
+              <span className="text-zinc-500 text-[10px]">{s.css}</span>
             </div>
           ))}
-          {/* Show custom value hint when input doesn't match a token */}
           {localValue && !isSpacingToken(localValue) && (
-            <div className="editor-spacing-dropdown-custom">
-              <span className="editor-spacing-dropdown-token">
-                [{localValue}]
-              </span>
-              <span className="editor-spacing-dropdown-css">custom value</span>
+            <div className="flex justify-between items-center px-2 py-1 border-t border-zinc-700 gap-1.5">
+              <span className="text-amber-400 text-[11px] font-medium">[{localValue}]</span>
+              <span className="text-zinc-500 text-[10px] italic">custom value</span>
             </div>
           )}
         </div>
       )}
     </div>
+  );
+}
+
+// ── Toggle button ──
+
+function ToggleBtn({ expanded, onClick }: { expanded: boolean; onClick: () => void }) {
+  return (
+    <button
+      className="bg-transparent border border-zinc-700 rounded text-zinc-500 cursor-pointer flex items-center justify-center w-7 h-7 shrink-0 p-0 transition-colors hover:text-zinc-300 hover:border-zinc-300"
+      onClick={onClick}
+      title={expanded ? "Switch to axis mode" : "Switch to individual sides"}
+    >
+      <IconToggle expanded={expanded} />
+    </button>
   );
 }
 
@@ -266,9 +281,9 @@ export default function SpacingBoxInput({
   onChangeSide,
 }: SpacingBoxInputProps) {
   return (
-    <div className="editor-spacing-box">
+    <div className="flex flex-col gap-1">
       {mode === "collapsed" ? (
-        <div className="editor-spacing-row">
+        <div className="flex gap-1 items-start">
           <SpacingInput
             icon={<IconPaddingY />}
             value={valuesAxis.y}
@@ -281,17 +296,11 @@ export default function SpacingBoxInput({
             onChange={(v) => onChangeAxis("x", v)}
             title={`${label} horizontal (left & right)`}
           />
-          <button
-            className="editor-spacing-toggle"
-            onClick={onToggleMode}
-            title="Switch to individual sides"
-          >
-            <IconToggle expanded={false} />
-          </button>
+          <ToggleBtn expanded={false} onClick={onToggleMode} />
         </div>
       ) : (
         <>
-          <div className="editor-spacing-row">
+          <div className="flex gap-1 items-start">
             <SpacingInput
               icon={<IconPaddingTop />}
               value={valuesSides.top}
@@ -304,15 +313,9 @@ export default function SpacingBoxInput({
               onChange={(v) => onChangeSide("bottom", v)}
               title={`${label} bottom`}
             />
-            <button
-              className="editor-spacing-toggle"
-              onClick={onToggleMode}
-              title="Switch to axis mode"
-            >
-              <IconToggle expanded={true} />
-            </button>
+            <ToggleBtn expanded={true} onClick={onToggleMode} />
           </div>
-          <div className="editor-spacing-row">
+          <div className="flex gap-1 items-start">
             <SpacingInput
               icon={<IconPaddingLeft />}
               value={valuesSides.left}
@@ -325,7 +328,7 @@ export default function SpacingBoxInput({
               onChange={(v) => onChangeSide("right", v)}
               title={`${label} right`}
             />
-            <div className="editor-spacing-toggle-spacer" />
+            <div className="w-7 shrink-0" />
           </div>
         </>
       )}

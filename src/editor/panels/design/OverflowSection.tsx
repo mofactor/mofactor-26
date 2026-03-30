@@ -23,20 +23,18 @@ export default function OverflowSection({
 
   const handleToggle = useCallback(() => {
     if (isClipped) {
-      // Remove overflow-hidden/clip
       applyOverflowChange(null, variantKey, currentClasses, onAddClass, onRemoveClass);
     } else {
-      // Add overflow-hidden
       applyOverflowChange("hidden", variantKey, currentClasses, onAddClass, onRemoveClass);
     }
   }, [isClipped, variantKey, currentClasses, onAddClass, onRemoveClass]);
 
   return (
-    <div className="editor-design-overflow">
-      <label className="editor-design-checkbox-label">
+    <div className="flex items-center">
+      <label className="flex items-center gap-2 cursor-pointer text-[12px] text-zinc-300 select-none">
         <input
           type="checkbox"
-          className="editor-design-checkbox"
+          className="w-4 h-4 accent-zinc-300 cursor-pointer rounded"
           checked={isClipped}
           onChange={handleToggle}
         />

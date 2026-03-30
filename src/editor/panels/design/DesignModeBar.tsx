@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+
 export type Breakpoint = "base" | "sm" | "md" | "lg" | "xl" | "2xl";
 export type ThemeMode = "light" | "dark";
 
@@ -24,6 +26,32 @@ const THEMES: { key: ThemeMode; label: string }[] = [
   { key: "dark", label: "Dark" },
 ];
 
+// Pill used for both theme and breakpoint toggles
+function Pill({
+  label,
+  active,
+  title,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  title?: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      className={cn(
+        "bg-zinc-800 text-zinc-400 border border-transparent rounded px-2 py-px text-[10px] cursor-pointer transition-all hover:text-white",
+        active && "bg-white text-black"
+      )}
+      onClick={onClick}
+      title={title}
+    >
+      {label}
+    </button>
+  );
+}
+
 export default function DesignModeBar({
   breakpoint,
   theme,
@@ -33,37 +61,35 @@ export default function DesignModeBar({
   const isNonBase = breakpoint !== "base" || theme !== "light";
 
   return (
-    <div className="editor-design-modebar">
+    <div className="flex flex-col gap-1.5 mb-3 pb-2.5 border-b border-zinc-700">
       {/* Theme toggle */}
-      <div className="editor-design-modebar-group">
+      <div className="flex flex-wrap gap-[3px]">
         {THEMES.map((t) => (
-          <button
+          <Pill
             key={t.key}
-            className={`editor-component-pill ${theme === t.key ? "editor-component-pill--active" : ""}`}
+            label={t.label}
+            active={theme === t.key}
             onClick={() => onChangeTheme(t.key)}
-          >
-            {t.label}
-          </button>
+          />
         ))}
       </div>
 
       {/* Breakpoint selector */}
-      <div className="editor-design-modebar-group">
+      <div className="flex flex-wrap gap-[3px]">
         {BREAKPOINTS.map((bp) => (
-          <button
+          <Pill
             key={bp.key}
-            className={`editor-component-pill ${breakpoint === bp.key ? "editor-component-pill--active" : ""}`}
-            onClick={() => onChangeBreakpoint(bp.key)}
+            label={bp.label}
+            active={breakpoint === bp.key}
             title={bp.title}
-          >
-            {bp.label}
-          </button>
+            onClick={() => onChangeBreakpoint(bp.key)}
+          />
         ))}
       </div>
 
       {/* Non-base variant indicator */}
       {isNonBase && (
-        <div className="editor-design-variant-badge">
+        <div className="text-[10px] font-semibold text-amber-400 bg-amber-400/12 px-2 py-px rounded self-start">
           {theme === "dark" ? "dark:" : ""}
           {breakpoint !== "base" ? `${breakpoint}:` : ""}
         </div>

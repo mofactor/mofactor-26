@@ -30,19 +30,16 @@ export default function DesignEditor({
   const [breakpoint, setBreakpoint] = useState<Breakpoint>("base");
   const [theme, setTheme] = useState<ThemeMode>("light");
 
-  // Parse all design values from current classes
   const parsed = useMemo(
     () => parseDesignClasses(effectiveClasses),
     [effectiveClasses]
   );
 
-  // Current variant key based on mode bar selection
   const variantKey = useMemo(
     () => getVariantKey(breakpoint, theme),
     [breakpoint, theme]
   );
 
-  // Get values for the active variant
   const paddingSides = useMemo(
     () => getPaddingForVariant(parsed, variantKey),
     [parsed, variantKey]
@@ -63,8 +60,10 @@ export default function DesignEditor({
       />
 
       {/* Padding */}
-      <div className="editor-design-section">
-        <div className="editor-design-section-label">Padding</div>
+      <div className="mb-3">
+        <div className="text-zinc-500 text-[10px] uppercase tracking-[0.5px] mb-1.5">
+          Padding
+        </div>
         <PaddingSection
           paddingSides={paddingSides}
           variantKey={variantKey}
@@ -75,7 +74,7 @@ export default function DesignEditor({
       </div>
 
       {/* Overflow */}
-      <div className="editor-design-section">
+      <div className="mb-3">
         <OverflowSection
           overflowValue={overflowValue}
           variantKey={variantKey}
