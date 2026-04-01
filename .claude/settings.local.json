@@ -28,5 +28,9 @@
       "Bash(curl -s \"https://api.github.com/repos/levnikolaevich/claude-code-skills/git/trees/main?recursive=1\")",
       "mcp__editor-annotations__editor_watch"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "editor-annotations"
+  ],
+  "enableAllProjectMcpServers": true
 }

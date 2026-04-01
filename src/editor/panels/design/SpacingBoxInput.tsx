@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { SPACING_TOKENS, TOKEN_TO_CSS, isSpacingToken } from "../../tailwind/spacing-map";
+import { SPACING_TOKENS, TOKEN_TO_PX, isSpacingToken } from "../../tailwind/spacing-map";
 
 export type SpacingMode = "collapsed" | "expanded";
 
@@ -25,14 +25,14 @@ interface SpacingSuggestion {
 
 const ALL_SUGGESTIONS: SpacingSuggestion[] = SPACING_TOKENS.map((t) => ({
   token: t,
-  css: TOKEN_TO_CSS[t] ?? t,
+  css: TOKEN_TO_PX[t] ?? t,
 }));
 
 function filterSuggestions(query: string): SpacingSuggestion[] {
   if (!query) return ALL_SUGGESTIONS;
   const q = query.toLowerCase();
   return ALL_SUGGESTIONS.filter(
-    (s) => s.token.startsWith(q) || s.css.toLowerCase().includes(q)
+    (s) => s.token.startsWith(q) || s.css.toLowerCase().startsWith(q)
   );
 }
 
@@ -158,6 +158,7 @@ function SpacingInput({
         } else {
           commit(localValue);
         }
+        inputRef.current?.blur();
       } else if (e.key === "Escape") {
         setEditing(false);
         setShowDropdown(false);
@@ -189,7 +190,7 @@ function SpacingInput({
   }, [focusedIdx]);
 
   const displayValue = editing ? localValue : value;
-  const cssHint = !editing && value && isSpacingToken(value) ? TOKEN_TO_CSS[value] : undefined;
+  const cssHint = !editing && value && isSpacingToken(value) ? TOKEN_TO_PX[value] : undefined;
 
   return (
     <div className="flex-1 relative min-w-0">
@@ -228,7 +229,7 @@ function SpacingInput({
           className="absolute top-[calc(100%+2px)] left-0 right-0 z-10 max-h-[180px] overflow-y-auto bg-zinc-900 border border-zinc-700 rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
           ref={dropdownRef}
         >
-          {suggestions.slice(0, 20).map((s, i) => (
+          {suggestions.map((s, i) => (
             <div
               key={s.token}
               className={cn(
@@ -248,7 +249,7 @@ function SpacingInput({
           {localValue && !isSpacingToken(localValue) && (
             <div className="flex justify-between items-center px-2 py-1 border-t border-zinc-700 gap-1.5">
               <span className="text-amber-400 text-[11px] font-medium">[{localValue}]</span>
-              <span className="text-zinc-500 text-[10px] italic">custom value</span>
+              <span className="text-zinc-500 text-[10px] italic">Enter to apply</span>
             </div>
           )}
         </div>

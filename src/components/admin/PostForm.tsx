@@ -405,6 +405,30 @@ export function PostForm({ initialData }: PostFormProps) {
           className="mx-auto block w-full max-w-2xl resize-none overflow-hidden bg-transparent text-5xl font-medium leading-[1.2] text-zinc-900 outline-none placeholder:text-zinc-300 dark:text-zinc-100 dark:placeholder:text-zinc-700"
         />
 
+        {/* Cover image */}
+        {coverPreviewUrl ? (
+          <div className="group relative mt-8 mb-10">
+            <img
+              src={coverPreviewUrl}
+              alt={title || "Cover"}
+              className="aspect-video w-full rounded-xl object-cover"
+            />
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={removeCoverImage}
+              className="absolute top-2 right-2 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity hover:bg-black/80 group-hover:opacity-100"
+            >
+              <X className="size-3.5" />
+            </Button>
+          </div>
+        ) : (
+          <Dropzone accept="image/*" onFile={handleCoverFile} className="mt-8 mb-10 aspect-video rounded-xl">
+            <Image className="size-6 text-zinc-300 dark:text-zinc-600" />
+            <span>Add cover image</span>
+          </Dropzone>
+        )}
+
         {/* Content */}
         <div>
           <TiptapEditor

@@ -29,7 +29,7 @@ export default function WadiGroceryPage() {
           {/* Hero */}
           <section id="root" aria-labelledby="root-title" className="relative py-24">
             <div className="container relative">
-              <header className="grid grid-cols-1 md:grid-cols-12 items-end gap-10 md:gap-6 pt-24 pb-20">
+              <header className="grid grid-cols-1 md:grid-cols-12 items-end gap-10 md:gap-6 pb-20 pt-32">
                 <div className="md:col-span-8">
                   <HeroHeadline
                     line1="Mobile App Design"

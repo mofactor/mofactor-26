@@ -89,6 +89,18 @@ export default function EditorPanel() {
     return classes.join(" ");
   }, [originals, existingPatch]);
 
+  // effectiveClasses + pending add/remove — used by DesignEditor to stay reactive
+  const liveClasses = useMemo(() => {
+    let classes = effectiveClasses.split(/\s+/).filter(Boolean);
+    for (const cls of removedClasses) {
+      classes = classes.filter((c) => c !== cls);
+    }
+    for (const cls of addedClasses) {
+      if (!classes.includes(cls)) classes.push(cls);
+    }
+    return classes.join(" ");
+  }, [effectiveClasses, addedClasses, removedClasses]);
+
   // Auto-apply pending changes when element changes
   useEffect(() => {
     const prev = prevContextRef.current;
@@ -158,11 +170,15 @@ export default function EditorPanel() {
 
   const handleAddClass = useCallback(
     (cls: string) => {
-      setAddedClasses((prev) => [...prev, cls]);
       setRemovedClasses((prev) => prev.filter((c) => c !== cls));
+      // Only track as "added" if the class isn't already in the original set
+      const originalClasses = originals?.classes.split(/\s+/).filter(Boolean) ?? [];
+      if (!originalClasses.includes(cls)) {
+        setAddedClasses((prev) => (prev.includes(cls) ? prev : [...prev, cls]));
+      }
       element?.classList.add(cls);
     },
-    [element]
+    [element, originals]
   );
 
   const handleRemoveClass = useCallback(
@@ -372,7 +388,7 @@ export default function EditorPanel() {
             {activeTab === "design" && (
               <DesignEditor
                 element={element}
-                effectiveClasses={effectiveClasses}
+                effectiveClasses={liveClasses}
                 onAddClass={handleAddClass}
                 onRemoveClass={handleRemoveClass}
               />

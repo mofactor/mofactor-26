@@ -49,6 +49,15 @@ export const TOKEN_TO_CSS: Record<string, string> = {
   "96": "24rem",
 };
 
+/** Token → pixel value (assuming 1rem = 16px) */
+export const TOKEN_TO_PX: Record<string, string> = Object.fromEntries(
+  Object.entries(TOKEN_TO_CSS).map(([token, css]) => {
+    if (css === "0px" || css === "1px") return [token, css];
+    const rem = parseFloat(css);
+    return [token, `${rem * 16}px`];
+  })
+);
+
 /**
  * Check if a value is a known spacing token.
  */

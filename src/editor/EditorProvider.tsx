@@ -222,7 +222,7 @@ export default function EditorProvider({ children }: { children: ReactNode }) {
           }
         });
       }
-    });
+    }).catch(() => { /* server unavailable — ignore */ });
 
     return () => {
       if (unsubscribeSse) unsubscribeSse();
