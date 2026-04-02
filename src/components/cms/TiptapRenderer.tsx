@@ -57,8 +57,10 @@ function renderNode(node: TiptapNode, key: number): ReactNode {
         (c) => c.type !== "text" || c.text?.trim()
       );
       if (!hasContent) return null;
+      const pStyle = getBlockStyle(node.attrs);
+      const pCls = getBlockClasses(node.attrs);
       return (
-        <p key={key} style={getAlignStyle(node.attrs)}>
+        <p key={key} className={pCls || undefined} style={pStyle}>
           {renderInline(node.content)}
         </p>
       );
@@ -66,42 +68,55 @@ function renderNode(node: TiptapNode, key: number): ReactNode {
 
     case "heading": {
       const level = node.attrs?.level || 1;
-      const style = getAlignStyle(node.attrs);
+      const hStyle = getBlockStyle(node.attrs);
+      const hCls = getBlockClasses(node.attrs);
       const children = renderInline(node.content);
-      if (level === 1) return <h1 key={key} style={style}>{children}</h1>;
-      if (level === 2) return <h2 key={key} style={style}>{children}</h2>;
-      if (level === 3) return <h3 key={key} style={style}>{children}</h3>;
-      if (level === 4) return <h4 key={key} style={style}>{children}</h4>;
-      return <h5 key={key} style={style}>{children}</h5>;
+      if (level === 1) return <h1 key={key} className={hCls || undefined} style={hStyle}>{children}</h1>;
+      if (level === 2) return <h2 key={key} className={hCls || undefined} style={hStyle}>{children}</h2>;
+      if (level === 3) return <h3 key={key} className={hCls || undefined} style={hStyle}>{children}</h3>;
+      if (level === 4) return <h4 key={key} className={hCls || undefined} style={hStyle}>{children}</h4>;
+      return <h5 key={key} className={hCls || undefined} style={hStyle}>{children}</h5>;
     }
 
-    case "bulletList":
+    case "bulletList": {
+      const ulCls = getBlockClasses(node.attrs);
+      const ulStyle = getBlockStyleNoAlign(node.attrs);
       return (
-        <ul key={key}>
+        <ul key={key} className={ulCls || undefined} style={ulStyle}>
           {node.content?.map((child, i) => renderNode(child, i))}
         </ul>
       );
+    }
 
-    case "orderedList":
+    case "orderedList": {
+      const olCls = getBlockClasses(node.attrs);
+      const olStyle = getBlockStyleNoAlign(node.attrs);
       return (
-        <ol key={key}>
+        <ol key={key} className={olCls || undefined} style={olStyle}>
           {node.content?.map((child, i) => renderNode(child, i))}
         </ol>
       );
+    }
 
-    case "listItem":
+    case "listItem": {
+      const liCls = getBlockClasses(node.attrs);
+      const liStyle = getBlockStyleNoAlign(node.attrs);
       return (
-        <li key={key}>
+        <li key={key} className={liCls || undefined} style={liStyle}>
           {node.content?.map((child, i) => renderNode(child, i))}
         </li>
       );
+    }
 
-    case "blockquote":
+    case "blockquote": {
+      const bqCls = getBlockClasses(node.attrs);
+      const bqStyle = getBlockStyleNoAlign(node.attrs);
       return (
-        <blockquote key={key}>
+        <blockquote key={key} className={bqCls || undefined} style={bqStyle}>
           {node.content?.map((child, i) => renderNode(child, i))}
         </blockquote>
       );
+    }
 
     case "codeBlock":
       return (
@@ -219,6 +234,33 @@ function getAlignStyle(
     return { textAlign: attrs.textAlign };
   }
   return undefined;
+}
+
+/** Get combined className (regular classes) for a block node */
+function getBlockClasses(attrs?: Record<string, any>): string {
+  if (!attrs?.className) return "";
+  const { classes } = parseArbitraryClasses(attrs.className);
+  return classes;
+}
+
+/** Get combined inline style (arbitrary values + textAlign) for a block node */
+function getBlockStyle(
+  attrs?: Record<string, any>
+): React.CSSProperties | undefined {
+  const align = getAlignStyle(attrs);
+  if (!attrs?.className) return align;
+  const { style } = parseArbitraryClasses(attrs.className);
+  const merged = { ...style, ...align };
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
+/** Get inline style without textAlign (for list/blockquote elements) */
+function getBlockStyleNoAlign(
+  attrs?: Record<string, any>
+): React.CSSProperties | undefined {
+  if (!attrs?.className) return undefined;
+  const { style } = parseArbitraryClasses(attrs.className);
+  return Object.keys(style).length > 0 ? style : undefined;
 }
 
 // Re-export renderNode for use by child renderers

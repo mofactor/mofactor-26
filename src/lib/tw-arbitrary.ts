@@ -212,7 +212,7 @@ const VARIANT_SELECTORS: Record<string, (sel: string) => string> = {
 
 /** Escape special characters for use in CSS selectors */
 function escapeCSS(cls: string): string {
-  return cls.replace(/([:#\[\]().,%/])/g, "\\$1");
+  return cls.replace(/([!:#\[\]().,%/])/g, "\\$1");
 }
 
 /**
@@ -393,8 +393,12 @@ function resolveStandardUtility(cls: string): string | null {
   const direct = STANDARD_CLASS_MAP[cls];
   if (direct) return direct;
 
-  const isNeg = cls.startsWith("-");
-  const base = isNeg ? cls.slice(1) : cls;
+  // Strip ! (important) modifier
+  const isImportant = cls.startsWith("!");
+  const withoutBang = isImportant ? cls.slice(1) : cls;
+
+  const isNeg = withoutBang.startsWith("-");
+  const base = isNeg ? withoutBang.slice(1) : withoutBang;
 
   for (const prefix of SORTED_PREFIXES) {
     if (!base.startsWith(prefix + "-")) continue;
@@ -414,7 +418,8 @@ function resolveStandardUtility(cls: string): string | null {
     if (!cssValue) return null;
 
     if (isNeg && cssValue !== "auto") cssValue = `-${cssValue}`;
-    return props.map((p) => `${toKebab(p)}: ${cssValue}`).join("; ");
+    const imp = isImportant ? " !important" : "";
+    return props.map((p) => `${toKebab(p)}: ${cssValue}${imp}`).join("; ");
   }
   return null;
 }
@@ -440,18 +445,19 @@ export function generateVariantArbitraryCSS(classes: string[]): string {
 
     // Try arbitrary bracket syntax first: variant:prefix-[value]
     if (cls.includes("[")) {
-      const match = cls.match(/^([\w-]+):(-?)([\w-]+)-\[(.+)\]$/);
+      const match = cls.match(/^([\w-]+):(!?)(-?)([\w-]+)-\[(.+)\]$/);
       if (!match) continue;
 
-      const [, variant, neg, prefix, rawValue] = match;
+      const [, variant, bang, neg, prefix, rawValue] = match;
       const selectorFn = VARIANT_SELECTORS[variant];
       if (!selectorFn) continue;
 
       const declarations = resolveArbitraryToCSS(prefix, rawValue, neg === "-");
       if (!declarations) continue;
 
+      const imp = bang ? " !important" : "";
       const selector = selectorFn(`.${escapeCSS(cls)}`);
-      rules.push(`${selector}{${declarations.join(";")}}`);
+      rules.push(`${selector}{${declarations.map((d) => d + imp).join(";")}}`);
       continue;
     }
 
