@@ -423,10 +423,23 @@ export function PostForm({ initialData }: PostFormProps) {
             </Button>
           </div>
         ) : (
-          <Dropzone accept="image/*" onFile={handleCoverFile} className="mt-8 mb-10 aspect-video rounded-xl">
+          <div className="mt-8 mb-10 flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-300 text-xs text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">
             <Image className="size-6 text-zinc-300 dark:text-zinc-600" />
             <span>Add cover image</span>
-          </Dropzone>
+            <div className="flex gap-2">
+              <Dropzone accept="image/*" onFile={handleCoverFile} className="border-none px-3 py-1.5 text-[11px] hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                Upload
+              </Dropzone>
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => setFilePickerOpen(true)}
+                className="text-[11px] text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+              >
+                Choose from Library
+              </Button>
+            </div>
+          </div>
         )}
 
         {/* Content */}
@@ -896,6 +909,21 @@ export function PostForm({ initialData }: PostFormProps) {
                           editorRef.current?.updateNodeAttr(selectedNode.pos, "title", val);
                           editorRef.current?.updateNodeAttr(selectedNode.pos, "alt", val || selectedNode.attrs?.alt || "");
                           setSelectedNode({ ...selectedNode, attrs: { ...selectedNode.attrs, title: val } });
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Lightbox */}
+                  {selectedNode.type === "image" && (
+                    <div className="flex items-center justify-between pt-2">
+                      <UppercaseLabel className="mb-0">Lightbox</UppercaseLabel>
+                      <Switch
+                        size="xs"
+                        checked={selectedNode.attrs?.lightbox === true}
+                        onCheckedChange={(checked) => {
+                          editorRef.current?.updateNodeAttr(selectedNode.pos, "lightbox", checked);
+                          setSelectedNode({ ...selectedNode, attrs: { ...selectedNode.attrs, lightbox: checked } });
                         }}
                       />
                     </div>

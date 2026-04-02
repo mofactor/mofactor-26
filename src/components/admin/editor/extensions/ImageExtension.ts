@@ -54,6 +54,12 @@ export const StylableImage = Image.extend({
         renderHTML: (attrs: Record<string, boolean>) =>
           attrs.showCaption === false ? { "data-show-caption": "false" } : {},
       },
+      lightbox: {
+        default: false,
+        parseHTML: (el: HTMLElement) => el.getAttribute("data-lightbox") === "true",
+        renderHTML: (attrs: Record<string, boolean>) =>
+          attrs.lightbox ? { "data-lightbox": "true" } : {},
+      },
     };
   },
 
@@ -72,6 +78,7 @@ export const StylableImage = Image.extend({
             title: figcaption?.textContent || img.getAttribute("title") || null,
             darkSrc: fig.getAttribute("data-dark-src") || null,
             showCaption: fig.getAttribute("data-show-caption") !== "false",
+            lightbox: fig.getAttribute("data-lightbox") === "true",
           };
         },
       },
@@ -80,7 +87,7 @@ export const StylableImage = Image.extend({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const { src, alt, title, showCaption, "data-class": dataClass, "data-href": href, "data-target": target, "data-dark-src": darkSrc, "data-show-caption": _dsc, class: cls, style, ...figureAttrs } = HTMLAttributes;
+    const { src, alt, title, showCaption, lightbox, "data-class": dataClass, "data-href": href, "data-target": target, "data-dark-src": darkSrc, "data-show-caption": _dsc, "data-lightbox": _dlb, class: cls, style, ...figureAttrs } = HTMLAttributes;
 
     const { figure: figCls, inner: imgCls } = splitClasses(cls || "");
     const imgClasses = ["max-w-full", imgCls || "rounded-lg"].filter(Boolean).join(" ");
@@ -102,6 +109,7 @@ export const StylableImage = Image.extend({
         ...(target ? { "data-target": target } : {}),
         ...(darkSrc ? { "data-dark-src": darkSrc } : {}),
         ...(showCaption === false ? { "data-show-caption": "false" } : {}),
+        ...(lightbox ? { "data-lightbox": "true" } : {}),
         ...(figCls ? { class: figCls } : {}),
       }),
       ...children,

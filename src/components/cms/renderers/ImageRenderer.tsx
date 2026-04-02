@@ -1,4 +1,5 @@
 import { parseArbitraryClasses } from "@/lib/tw-arbitrary";
+import { Lightbox } from "@/components/ui/Lightbox";
 
 /** Classes that control layout width — must live on <figure> (direct child of .blog-prose) */
 const FIGURE_CLASSES = new Set(["wide", "full"]);
@@ -61,6 +62,21 @@ export function ImageRenderer({ attrs }: ImageRendererProps) {
         >
           {images}
         </a>
+      ) : attrs.lightbox ? (
+        hasDarkSrc ? (
+          <>
+            <Lightbox images={[{ src: attrs.src, alt: attrs.alt || "" }]}>
+              {lightImg}
+            </Lightbox>
+            <Lightbox images={[{ src: attrs.darkSrc, alt: attrs.alt || "" }]}>
+              {darkImg}
+            </Lightbox>
+          </>
+        ) : (
+          <Lightbox images={[{ src: attrs.src, alt: attrs.alt || "" }]}>
+            {lightImg}
+          </Lightbox>
+        )
       ) : (
         images
       )}
