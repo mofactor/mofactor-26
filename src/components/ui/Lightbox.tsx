@@ -114,11 +114,11 @@ function Lightbox({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Backdrop
           data-slot="lightbox-overlay"
-          className="data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 fixed inset-0 isolate z-50 bg-black/80 duration-100"
+          className="data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 fixed inset-0 isolate z-50 bg-black/80 backdrop-blur-md duration-100"
         />
         <DialogPrimitive.Popup
           data-slot="lightbox-content"
-          className="bg-white dark:bg-zinc-950 data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 ring-foreground/10 fixed top-1/2 left-1/2 z-50 flex flex-col w-full max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl ring-1 duration-100 outline-none h-[calc(100vh-2rem)] overflow-hidden p-0"
+          className="data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 fixed top-1/2 left-1/2 z-50 flex flex-col w-full max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl duration-100 outline-none h-[calc(100vh-2rem)] overflow-hidden p-0"
           onKeyDown={handleKeyDown}
         >
           {/* Header */}
@@ -126,14 +126,14 @@ function Lightbox({
             <div className="flex flex-col gap-1">
               <DialogPrimitive.Title
                 data-slot="lightbox-title"
-                className="flex items-center gap-2 text-base leading-none font-medium"
+                className="flex items-center gap-2 text-base leading-none font-medium text-white"
               >
                 {current.alt || "Image Preview"}
               </DialogPrimitive.Title>
               {showNav && (
                 <DialogPrimitive.Description
                   data-slot="lightbox-description"
-                  className="text-muted-foreground text-sm"
+                  className="text-white/60 text-sm"
                 >
                   {currentIndex + 1} of {images.length}
                 </DialogPrimitive.Description>
@@ -142,7 +142,7 @@ function Lightbox({
             <Button
               variant="ghost"
               size="icon"
-              className="mr-14 size-10 mt-0 shrink-0"
+              className="mr-14 size-10 mt-0 shrink-0 text-white hover:text-white hover:bg-white/10"
               onClick={toggleZoom}
             >
               {zoomed ? <ZoomOut className="size-5" /> : <ZoomIn className="size-5" />}
@@ -190,7 +190,7 @@ function Lightbox({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-8 top-1/2 mr-4 -translate-y-1/2 h-8 w-8 rounded-full bg-background/80"
+                  className="absolute right-8 top-1/2 mr-4 -translate-y-1/2 h-8 w-8 rounded-full bg-white/10 text-white hover:bg-white/20"
                   onClick={goNext}
                 >
                   <ChevronRight className="size-7" />
@@ -211,8 +211,8 @@ function Lightbox({
                   className={cn(
                     "w-12 h-12 rounded-lg cursor-pointer overflow-hidden border-2 transition-colors",
                     i === currentIndex
-                      ? "border-foreground"
-                      : "border-transparent hover:border-zinc-300 dark:hover:border-zinc-700"
+                      ? "border-white"
+                      : "border-transparent hover:border-white/50"
                   )}
                 >
                   <img
@@ -231,7 +231,7 @@ function Lightbox({
             render={
               <Button
                 variant="ghost"
-                className="absolute top-4 right-4"
+                className="absolute top-4 right-4 text-white hover:text-white hover:bg-white/10"
                 size="lg"
               >
                 <XIcon className="size-6" />
