@@ -35,7 +35,9 @@ function Lightbox({
   const [internalIndex, setInternalIndex] = React.useState(0);
   const [zoomed, setZoomed] = React.useState(false);
   const [naturalSize, setNaturalSize] = React.useState<{ w: number; h: number } | null>(null);
+  const [isTall, setIsTall] = React.useState(false);
   const imgRef = React.useRef<HTMLImageElement>(null);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
@@ -53,6 +55,7 @@ function Lightbox({
   React.useEffect(() => {
     setZoomed(false);
     setNaturalSize(null);
+    setIsTall(false);
   }, [currentSrc]);
 
   const toggleZoom = React.useCallback(() => {
@@ -153,7 +156,7 @@ function Lightbox({
           {/* Image area wrapper — relative so nav buttons are pinned here */}
           <div className="relative flex-1 min-h-0">
             {/* Scrollable image */}
-            <div className="h-full overflow-auto px-4 py-8 flex items-center" onClick={() => setOpen(false)}>
+            <div ref={scrollContainerRef} className={cn("h-full overflow-auto px-4 py-8 flex", (zoomed || isTall) ? "items-start" : "items-center")} onClick={() => setOpen(false)}>
               <div className={cn("rounded-lg flex justify-center items-center w-full")} onClick={() => setOpen(false)}>
                 <img
                   ref={imgRef}
@@ -170,6 +173,10 @@ function Lightbox({
                   onLoad={(e) => {
                     const img = e.currentTarget;
                     setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight });
+                    const container = scrollContainerRef.current;
+                    if (container) {
+                      setIsTall(img.offsetHeight >= container.clientHeight);
+                    }
                   }}
                 />
               </div>
