@@ -153,8 +153,8 @@ function Lightbox({
           {/* Image area wrapper — relative so nav buttons are pinned here */}
           <div className="relative flex-1 min-h-0">
             {/* Scrollable image */}
-            <div className="h-full overflow-auto px-4 py-8">
-              <div className={cn("rounded-lg flex justify-center items-start")}>
+            <div className="h-full overflow-auto px-4 py-8 flex items-center" onClick={() => setOpen(false)}>
+              <div className={cn("rounded-lg flex justify-center items-center w-full")} onClick={() => setOpen(false)}>
                 <img
                   ref={imgRef}
                   src={current.src}
@@ -166,7 +166,7 @@ function Lightbox({
                       : "w-full h-auto max-w-[1400px]"
                   )}
                   style={zoomed && naturalSize ? { width: naturalSize.w / 2, height: naturalSize.h / 2 } : undefined}
-                  onClick={toggleZoom}
+                  onClick={(e) => { e.stopPropagation(); toggleZoom(); }}
                   onLoad={(e) => {
                     const img = e.currentTarget;
                     setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight });
