@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
 import { EDITOR_ATTR } from "./constants";
 import { useEditor } from "./EditorProvider";
 import {
@@ -113,6 +114,15 @@ export default function AnnotationOverlay() {
   const isEditorElement = useCallback((el: HTMLElement) => {
     return !!el.closest(`[${EDITOR_ATTR}]`);
   }, []);
+
+  // Clear open popups when annotate mode is turned off
+  useEffect(() => {
+    if (!editor?.annotateMode) {
+      setEditingId(null);
+      setIsEditingComment(false);
+      setPending(null);
+    }
+  }, [editor?.annotateMode]);
 
   // Hover highlight in annotate mode
   useEffect(() => {
@@ -303,14 +313,14 @@ export default function AnnotationOverlay() {
 
   const popupStyle = pending
     ? (() => {
-        const popupWidth = 360;
-        const popupHeight = 220;
-        let left = (pending.x / 100) * window.innerWidth - popupWidth / 2;
-        left = Math.max(8, Math.min(left, window.innerWidth - popupWidth - 8));
-        const spaceAbove = pending.clientY;
-        const top = spaceAbove > popupHeight + 20 ? pending.y - popupHeight - 12 : pending.y + 16;
-        return { left, top, width: popupWidth };
-      })()
+      const popupWidth = 360;
+      const popupHeight = 220;
+      let left = (pending.x / 100) * window.innerWidth - popupWidth / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - popupWidth - 8));
+      const spaceAbove = pending.clientY;
+      const top = spaceAbove > popupHeight + 20 ? pending.y - popupHeight - 12 : pending.y + 16;
+      return { left, top, width: popupWidth };
+    })()
     : null;
 
   const renderableAnnotations = editor.annotations.filter(
@@ -445,16 +455,23 @@ export default function AnnotationOverlay() {
         const statusLabel = ann.status || "pending";
         return (
           <div
-            className="absolute z-[9996] bg-zinc-900 border border-zinc-700 rounded-[10px] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-[12px] text-zinc-300 max-h-[600px] overflow-y-auto"
+            className="absolute z-[9996] bg-zinc-900 border border-zinc-700 rounded-[10px] p-4 shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-[12px] text-zinc-300 max-h-[600px] overflow-y-auto"
             style={{ left, top, width: popW }}
           >
-            <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center justify-between gap-2 mb-4">
               <span className="text-zinc-200 font-semibold text-[12px] overflow-hidden text-ellipsis whitespace-nowrap max-w-[200px]">
                 {ann.element}
               </span>
               <span className={cn("text-[9px] uppercase tracking-[0.5px] px-[6px] py-px rounded-[3px] shrink-0", statusStyles[statusLabel])}>
                 {statusLabel}
               </span>
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => setEditingId(null)}
+              >
+                Close
+              </Button>
               <button
                 className="bg-transparent border-none cursor-pointer p-0 text-rose-400 text-[11px] opacity-70 hover:opacity-100"
                 onClick={() => {
@@ -506,7 +523,7 @@ export default function AnnotationOverlay() {
                 </div>
               </>
             ) : (
-              <div className="flex items-start gap-2 mb-2">
+              <div className="flex items-start gap-3 mb-4">
                 <div className="flex-1 text-zinc-200 text-[12px] leading-[1.4] whitespace-pre-wrap break-words">
                   {ann.comment}
                 </div>
@@ -541,7 +558,7 @@ export default function AnnotationOverlay() {
 
             {/* Thread messages */}
             {hasThread && (
-              <div className="border-t border-zinc-700 mt-2 pt-1.5">
+              <div className="border-t border-zinc-700 mt-2 pt-2">
                 <div className="text-zinc-500 text-[10px] uppercase tracking-[0.5px] mb-1.5">
                   Thread
                 </div>
@@ -572,18 +589,18 @@ export default function AnnotationOverlay() {
                     && ann.thread![ann.thread!.length - 1].role === "user"
                     && ann.status !== "resolved"
                     && ann.status !== "dismissed" && (
-                    <div className="px-2 py-1 rounded-md text-[12px] leading-[1.4] bg-zinc-400/10 opacity-70 flex items-center">
-                      <span className="text-[9px] font-semibold uppercase tracking-[0.3px] mr-1.5 text-blue-500">
-                        Claude
-                      </span>
-                      <span className="text-zinc-300 leading-[1.5]">thinking</span>
-                      <span className="inline-flex items-center gap-1 ml-0.5">
-                        <span className="editor-thinking-dot" />
-                        <span className="editor-thinking-dot" />
-                        <span className="editor-thinking-dot" />
-                      </span>
-                    </div>
-                  )}
+                      <div className="px-2 py-1 rounded-md text-[12px] leading-[1.4] bg-zinc-400/10 opacity-70 flex items-center">
+                        <span className="text-[9px] font-semibold uppercase tracking-[0.3px] mr-1.5 text-blue-500">
+                          Claude
+                        </span>
+                        <span className="text-zinc-300 leading-[1.5]">thinking</span>
+                        <span className="inline-flex items-center gap-1 ml-0.5">
+                          <span className="editor-thinking-dot" />
+                          <span className="editor-thinking-dot" />
+                          <span className="editor-thinking-dot" />
+                        </span>
+                      </div>
+                    )}
                   <div ref={threadEndRef} />
                 </div>
               </div>

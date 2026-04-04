@@ -173,7 +173,15 @@ export default function EditorProvider({ children }: { children: ReactNode }) {
   // Load annotations on mount + connect to MCP server + subscribe to SSE
   useEffect(() => {
     const pathname = window.location.pathname;
-    const loaded = loadAnnotations(pathname);
+    const raw = loadAnnotations(pathname);
+    // Deduplicate by ID (guards against corrupted localStorage)
+    const seen = new Set<string>();
+    const loaded = raw.filter((a) => {
+      if (seen.has(a.id)) return false;
+      seen.add(a.id);
+      return true;
+    });
+    if (loaded.length !== raw.length) saveAnnotations(pathname, loaded);
     setAnnotations(loaded);
     let unsubscribeSse: (() => void) | null = null;
 
@@ -184,9 +192,11 @@ export default function EditorProvider({ children }: { children: ReactNode }) {
       const session = await createSession(pathname);
       if (session) {
         sessionIdRef.current = session.id;
-        // Sync any existing annotations to the server
+        // Sync only active annotations to the server (skip resolved/dismissed)
         for (const ann of loaded) {
-          syncAnnotation(session.id, ann);
+          if (ann.status !== "resolved" && ann.status !== "dismissed") {
+            syncAnnotation(session.id, ann);
+          }
         }
         // Subscribe to SSE for real-time updates from Claude
         unsubscribeSse = subscribeToEvents(session.id, (event) => {
@@ -252,7 +262,8 @@ export default function EditorProvider({ children }: { children: ReactNode }) {
 
   const addAnnotation = useCallback((annotation: Annotation) => {
     setAnnotations((prev) => {
-      const next = [...prev, annotation];
+      // Deduplicate by ID
+      const next = [...prev.filter((a) => a.id !== annotation.id), annotation];
       saveAnnotations(window.location.pathname, next);
       return next;
     });

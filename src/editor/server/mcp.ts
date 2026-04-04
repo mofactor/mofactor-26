@@ -43,6 +43,12 @@ async function httpPatch<T>(path: string, body: unknown): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+async function httpDelete<T>(path: string): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, { method: "DELETE" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+  return res.json() as Promise<T>;
+}
+
 // =============================================================================
 // Annotation formatting (for tool responses)
 // =============================================================================
@@ -325,6 +331,35 @@ export async function startMcpServer(baseUrl?: string): Promise<void> {
           })
           .catch(() => { /* connection closed or aborted */ });
       });
+    }
+  );
+
+  // -- Get Completed (History) --
+  server.tool(
+    "editor_get_completed",
+    "Get completed (resolved/dismissed) annotations from persistent history. History survives server restarts.",
+    {},
+    async () => {
+      const entries = await httpGet<(Annotation & { completedAt: number })[]>("/history");
+      if (entries.length === 0) {
+        return { content: [{ type: "text", text: "No completed annotations in history." }] };
+      }
+      const text = entries.map((e) => {
+        const date = new Date(e.completedAt).toLocaleString();
+        return `${formatAnnotation(e)}\n- **Completed:** ${date}`;
+      }).join("\n\n---\n\n");
+      return { content: [{ type: "text", text: `# Completed Annotations (${entries.length})\n\n${text}` }] };
+    }
+  );
+
+  // -- Clear History --
+  server.tool(
+    "editor_clear_history",
+    "Clear all completed annotation history. This permanently removes the history file contents.",
+    {},
+    async () => {
+      await httpDelete("/history");
+      return { content: [{ type: "text", text: "Annotation history cleared." }] };
     }
   );
 

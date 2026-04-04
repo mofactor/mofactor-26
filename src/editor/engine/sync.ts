@@ -86,6 +86,27 @@ export async function syncAddThreadMessage(
   }
 }
 
+// ── History ──
+
+export async function fetchHistory(): Promise<Annotation[]> {
+  try {
+    const res = await fetch(`${ENDPOINT}/history`);
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
+export async function clearServerHistory(): Promise<boolean> {
+  try {
+    const res = await fetch(`${ENDPOINT}/history`, { method: "DELETE" });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 // ── SSE Event Subscription ──
 
 export interface SseEvent {

@@ -117,7 +117,7 @@ function Lightbox({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Backdrop
           data-slot="lightbox-overlay"
-          className="data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 fixed inset-0 isolate z-50 bg-black/80 backdrop-blur-md duration-100"
+          className="data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 fixed inset-0 isolate z-50 bg-black/90 backdrop-blur-md duration-100"
         />
         <DialogPrimitive.Popup
           data-slot="lightbox-content"

@@ -18,6 +18,7 @@ import {
   getAllPending,
   type StoreEvent,
 } from "./store.js";
+import { getHistory, clearHistory } from "./history.js";
 import {
   getAllAgents,
   getAgent,
@@ -175,6 +176,17 @@ addRoute("GET", "/sessions/:id/pending", (_req, res, params) => {
 
 addRoute("GET", "/pending", (_req, res) => {
   json(res, getAllPending());
+});
+
+// -- History --
+
+addRoute("GET", "/history", (_req, res) => {
+  json(res, getHistory());
+});
+
+addRoute("DELETE", "/history", (_req, res) => {
+  clearHistory();
+  json(res, { ok: true });
 });
 
 // -- Thread --

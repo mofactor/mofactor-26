@@ -3,6 +3,8 @@
  * No database — annotations are transient dev feedback.
  */
 
+import { appendToHistory } from "./history.js";
+
 // =============================================================================
 // Types (server-side, compatible with browser Annotation type)
 // =============================================================================
@@ -205,6 +207,12 @@ export function updateAnnotation(
   if (!annotation) return null;
   Object.assign(annotation, updates);
   eventBus.emit("annotation.updated", annotation.sessionId, annotation);
+
+  // Auto-archive completed annotations to persistent history
+  if (annotation.status === "resolved" || annotation.status === "dismissed") {
+    appendToHistory(annotation);
+  }
+
   return annotation;
 }
 
