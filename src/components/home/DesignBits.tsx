@@ -79,7 +79,7 @@ function BitSliderNav() {
   );
 }
 
-function BitSlider({ item, autoplayDelay = 4000 }: { item: DesignBitItem; autoplayDelay?: number }) {
+function BitSlider({ item, autoplayDelay = 4000, slideBasis }: { item: DesignBitItem; autoplayDelay?: number; slideBasis?: string }) {
   const [lbOpen, setLbOpen] = useState(false);
   const [lbIndex, setLbIndex] = useState(0);
   const [emblaApi, setEmblaApi] = useState<EmblaCarouselType>();
@@ -87,7 +87,8 @@ function BitSlider({ item, autoplayDelay = 4000 }: { item: DesignBitItem; autopl
 
   const slides = item.slides!;
   const lightboxImages: LightboxImage[] = slides.map((s) => ({
-    src: s.fullSrc,
+    src: s.src,
+    fullSrc: s.fullSrc,
     alt: s.alt,
   }));
 
@@ -183,6 +184,7 @@ function BitSlider({ item, autoplayDelay = 4000 }: { item: DesignBitItem; autopl
                 <CarouselItem
                   key={i}
                   className="cursor-pointer"
+                  style={slideBasis ? { flexBasis: slideBasis } : undefined}
                   onClick={() => {
                     setLbIndex(i);
                     setLbOpen(true);
@@ -258,7 +260,8 @@ function BitStatic({ item }: { item: DesignBitItem }) {
   const [lbIndex, setLbIndex] = useState(0);
 
   const lightboxImages: LightboxImage[] = (item.images ?? []).map((img) => ({
-    src: img.fullSrc,
+    src: img.src,
+    fullSrc: img.fullSrc,
     alt: img.alt,
   }));
 
@@ -327,7 +330,7 @@ export default function DesignBits() {
                 className={`group relative flex flex-col overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-925${spanFull ? " sm:col-span-2" : ""}`}
               >
                 {item.slides ? (
-                  <BitSlider item={item} autoplayDelay={spanFull ? 6000 : 3500} />
+                  <BitSlider item={item} autoplayDelay={spanFull ? 6000 : 3500} slideBasis={item.title === "AI Bits" ? "40%" : undefined} />
                 ) : item.video ? (
                   <BitVideo item={item} />
                 ) : (

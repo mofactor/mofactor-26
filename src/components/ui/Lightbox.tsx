@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 
 export type LightboxImage = {
   src: string;
+  fullSrc?: string;
   alt: string;
 };
 
@@ -160,13 +161,13 @@ function Lightbox({
               <div className={cn("rounded-lg flex justify-center items-center w-full")} onClick={() => setOpen(false)}>
                 <img
                   ref={imgRef}
-                  src={current.src}
+                  src={zoomed && current.fullSrc ? current.fullSrc : current.src}
                   alt={current.alt}
                   className={cn(
                     "rounded-xl border border-black/12 dark:border-white/12 cursor-pointer",
                     zoomed
                       ? "max-w-none max-h-none"
-                      : "w-full h-auto max-w-[1400px]"
+                      : "h-auto max-w-[1200px] max-h-[calc(100vh-12rem)]"
                   )}
                   style={zoomed && naturalSize ? { width: naturalSize.w / 2, height: naturalSize.h / 2 } : undefined}
                   onClick={(e) => { e.stopPropagation(); toggleZoom(); }}
