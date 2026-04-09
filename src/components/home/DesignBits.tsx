@@ -330,7 +330,7 @@ export default function DesignBits() {
                 className={`group relative flex flex-col overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-925${spanFull ? " sm:col-span-2" : ""}`}
               >
                 {item.slides ? (
-                  <BitSlider item={item} autoplayDelay={spanFull ? 6000 : 3500} slideBasis={item.title === "AI Bits" ? "40%" : undefined} />
+                  <BitSlider item={item} autoplayDelay={spanFull ? 6000 : 3500} slideBasis={item.slideBasis} />
                 ) : item.video ? (
                   <BitVideo item={item} />
                 ) : (

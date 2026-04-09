@@ -12,6 +12,7 @@ export type DesignBitItem = {
   readTime?: string;
   comingSoon: boolean;
   slides?: DesignBitSlide[];
+  slideBasis?: string;
   navTheme?: "dark" | "light";
   video?: string;
   videoClassName?: string;
@@ -61,9 +62,10 @@ export const designBitsItems: DesignBitItem[] = [
   },
   {
     title: "AI Bits",
-    description: "AI-generated visuals — experimental image generation explorations",
+    description: "Design directed visuals — experimental image generation explorations with AI",
     date: null,
     category: "AI-Gen Visuals",
+    slideBasis: "40%",
     navTheme: "dark",
     comingSoon: false,
     slides: [
