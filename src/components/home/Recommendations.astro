@@ -1,0 +1,16 @@
+---
+// Prepares avatars (56px circles → 56w/112w instead of next/image's full-width fill)
+// and hydrates the testimonial carousel when it scrolls into view.
+import RecommendationsCarousel from "./RecommendationsCarousel";
+import { testimonials } from "@/data/testimonials";
+import { islandImage } from "@/lib/images";
+
+const withAvatars = await Promise.all(
+  testimonials.map(async (t) => ({
+    ...t,
+    avatarImage: await islandImage(t.avatar, { width: 56, densities: [1, 2] }),
+  })),
+);
+---
+
+<RecommendationsCarousel client:visible testimonials={withAvatars} />

@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 
 export type Breakpoint = "base" | "sm" | "md" | "lg" | "xl" | "2xl";

@@ -1,0 +1,17 @@
+---
+import Base from "@/layouts/Base.astro";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer.astro";
+---
+
+<Base title="Page not found" noindex>
+  <Header client:load />
+  <main class="container min-h-[70svh] pt-40 pb-24">
+    <h1 class="text-[32px] md:text-[48px] font-normal leading-[1.25]">
+      <span class="text-zinc-400 dark:text-zinc-500">404.</span><br />
+      <span class="text-foreground">This page doesn't exist.</span>
+    </h1>
+    <a href="/" class="mt-8 inline-block text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">← Back home</a>
+  </main>
+  <Footer />
+</Base>

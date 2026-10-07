@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { ChevronLeft, ChevronRight, XIcon, ZoomIn, ZoomOut } from "lucide-react";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
@@ -97,23 +95,50 @@ function Lightbox({
     [goPrev, goNext]
   );
 
+  // Trigger area: children may be static HTML from an Astro page (one opaque block), so
+  // instead of wrapping each child, one delegated handler maps the clicked <img> to its
+  // position among the images in the area. That order matches `images`.
+  const triggerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    triggerRef.current?.querySelectorAll("img").forEach((img) => {
+      img.setAttribute("role", "button");
+      img.setAttribute("aria-haspopup", "dialog");
+      img.tabIndex = 0;
+      img.classList.add("cursor-pointer");
+    });
+  }, [children]);
+
+  const openFromTarget = (target: EventTarget | null) => {
+    const root = triggerRef.current;
+    const img = target instanceof Element ? target.closest("img") : null;
+    if (!root || !img || !root.contains(img)) return false;
+    const i = Array.from(root.querySelectorAll("img")).indexOf(img);
+    if (i < 0) return false;
+    setCurrentIndex(i);
+    setOpen(true);
+    return true;
+  };
+
   if (!current) return null;
 
   const showNav = images.length > 1;
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={(v) => { setOpen(v); if (!v) setZoomed(false); }}>
-      {children &&
-        React.Children.map(children, (child, i) => (
-          <DialogPrimitive.Trigger
-            data-slot="lightbox-trigger"
-            className={cn("contents cursor-pointer", className)}
-            onClick={() => setCurrentIndex(i)}
-          >
-            {child}
-          </DialogPrimitive.Trigger>
-        ))
-      }
+      {children && (
+        <div
+          ref={triggerRef}
+          data-slot="lightbox-trigger"
+          className={cn("contents", className)}
+          onClick={(e) => openFromTarget(e.target)}
+          onKeyDown={(e) => {
+            if ((e.key === "Enter" || e.key === " ") && openFromTarget(e.target)) e.preventDefault();
+          }}
+        >
+          {children}
+        </div>
+      )}
 
       <DialogPrimitive.Portal>
         <DialogPrimitive.Backdrop

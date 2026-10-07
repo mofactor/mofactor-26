@@ -1,0 +1,110 @@
+---
+// Static port of DesignBits.tsx. Islands: BitSlider (carousel cards) and the Lightbox
+// on static image cards. Video cards are plain HTML + LazyVideo.astro.
+import { Image } from "astro:assets";
+import DualLineHeading from "@/components/ui/DualLineHeading.astro";
+import LazyVideo from "@/components/ui/LazyVideo.astro";
+import { Lightbox } from "@/components/ui/Lightbox";
+import BitSlider from "./BitSlider";
+import DesignBitMeta from "./DesignBitMeta.astro";
+import { designBitsItems } from "@/data/designBits";
+import { img, islandImage } from "@/lib/images";
+
+// Same sizing next/image used here: width 1050, 1x/2x
+const bits = await Promise.all(
+  designBitsItems.map(async (item) => ({
+    item,
+    spanFull: !!item.slides && item.slides.length > 5,
+    slideImages: item.slides
+      ? await Promise.all(item.slides.map((s) => islandImage(s.src, { width: 1050, densities: [1, 2] })))
+      : [],
+  })),
+);
+---
+
+<div>
+  <DualLineHeading
+    topLine="Design bits."
+    bottomLine="What I'm lately working on."
+  />
+
+  <div class="mt-12">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {bits.map(({ item, spanFull, slideImages }) => (
+        <article class={`group relative flex flex-col overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-925${spanFull ? " sm:col-span-2" : ""}`}>
+          {item.slides ? (
+            <BitSlider
+              client:visible
+              item={item}
+              slideImages={slideImages}
+              autoplayDelay={spanFull ? 6000 : 3500}
+              slideBasis={item.slideBasis}
+            />
+          ) : item.video ? (
+            <>
+              <div class="relative p-5 pb-4">
+                <div class="text-body mb-2 h-[16px] overflow-hidden text-[12px]">
+                  <DesignBitMeta item={item} />
+                </div>
+                <h3 class="max-w-xs text-[20px] leading-[1.35] dark:text-white">
+                  {item.title}
+                </h3>
+              </div>
+              <div class="p-5 pt-0" data-nav-theme={item.navTheme}>
+                <LazyVideo
+                  src={item.video}
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  class={`w-full rounded-xl object-cover ${item.videoClassName ?? ""}`}
+                  style="aspect-ratio: 1050/720"
+                />
+              </div>
+              {item.description && (
+                <p class="px-5 pb-5 leading-[1.5] text-body">
+                  {item.description}
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              <div class="relative p-5 pb-4">
+                <div class="text-body mb-2 h-[16px] overflow-hidden text-[12px]">
+                  <DesignBitMeta item={item} />
+                </div>
+                <h3 class="max-w-xs text-[20px] leading-[1.35] dark:text-white">
+                  {item.title}
+                </h3>
+              </div>
+              {item.images && (
+                <div class="p-5 pt-0" data-nav-theme={item.navTheme}>
+                  <Lightbox
+                    client:idle
+                    images={item.images.map(({ src, fullSrc, alt }) => ({ src, fullSrc, alt }))}
+                  >
+                    {item.images.map((image) => (
+                      <Image
+                        src={img(image.src)}
+                        alt={image.alt}
+                        width={1050}
+                        densities={[1, 2]}
+                        class="w-full cursor-pointer rounded-xl"
+                      />
+                    ))}
+                  </Lightbox>
+                </div>
+              )}
+              {item.description && (
+                <p class="px-5 pb-5 leading-[1.5] text-body">
+                  {item.description}
+                </p>
+              )}
+            </>
+          )}
+        </article>
+      ))}
+    </div>
+    {/* <p class="text-center text-sm mt-24 text-muted-foreground mt-8">More bits coming soon</p> */}
+  </div>
+</div>

@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EDITOR_ATTR } from "./constants";
 import { useEditor } from "./EditorProvider";

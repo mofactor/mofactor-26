@@ -1,11 +1,19 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import WarpedNoiseShader from "./WarpedNoiseShader";
 
-const AscendShader = dynamic(() => import("./AscendShader"), { ssr: false });
+// Client-only: three.js loads in its own chunk after hydration (was next/dynamic with ssr: false)
+const AscendShaderLazy = lazy(() => import("./AscendShader"));
+function AscendShader(props: React.ComponentProps<typeof AscendShaderLazy>) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return (
+    <Suspense fallback={null}>
+      <AscendShaderLazy {...props} />
+    </Suspense>
+  );
+}
 
 export default function HeroShader() {
   const { theme } = useTheme();

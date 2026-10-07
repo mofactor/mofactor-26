@@ -1,0 +1,84 @@
+---
+// Server island (rendered with server:defer): the homepage stays static while the latest
+// posts are fetched per request. Replaces the client-side ConvexReactClient (and its
+// websocket) that BlogPosts.tsx opened on every homepage visit.
+import Badge from "@/components/ui/Badge.astro";
+import DualLineHeading from "@/components/ui/DualLineHeading.astro";
+import type { FunctionReturnType } from "convex/server";
+import { convex } from "@/lib/convex-server";
+import { api } from "@convex/_generated/api";
+
+type Post = FunctionReturnType<typeof api.posts.listRecent>[number];
+
+let posts: Post[] = [];
+try {
+  posts = convex ? await convex.query(api.posts.listRecent, { limit: 3 }) : [];
+} catch {
+  // Convex unavailable: render nothing, as the client version did while empty
+}
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString("en-US", { month: "long", day: "2-digit", year: "numeric", timeZone: "UTC" });
+---
+
+{posts.length > 0 && (
+  <div class="mb-32 md:mb-40">
+    <DualLineHeading topLine="Journal" bottomLine="The Ramblings." />
+
+    <div class="mt-10 space-y-16">
+      {posts.map((post) => {
+        const date = post.publishedAt ? new Date(post.publishedAt) : null;
+        return (
+          <a href={`/blog/${post.slug}`} class="group block">
+            <article>
+              <div class="pt-12 relative before:absolute after:absolute before:bg-zinc-900 after:bg-zinc-900/10 dark:before:bg-zinc-100 dark:after:bg-zinc-100/10 before:top-0 before:left-0 before:h-px before:w-6 after:top-0 after:right-0 after:left-8 after:h-px">
+                <div class="grid grid-cols-1 items-center gap-6 pt-10 md:grid-cols-12 md:gap-16 md:pt-0">
+                  {/* Left — cover image & date */}
+                  <div class="md:col-span-5">
+                    <div class="flex items-center gap-6">
+                      {post.coverImageUrl && (
+                        <img
+                          src={post.coverImageUrl}
+                          alt=""
+                          class="flex-none w-40 rounded-lg"
+                        />
+                      )}
+                      <div>
+                        {date && (
+                          <time
+                            datetime={date.toISOString().split("T")[0]}
+                            class="text-lg font-medium text-zinc-500 dark:text-zinc-400"
+                          >
+                            {formatDate(date)}
+                          </time>
+                        )}
+                        {post.tags && post.tags.length > 0 && (
+                          <div class="mt-3.5 flex flex-wrap gap-1">
+                            {post.tags.map((tag) => (
+                              <Badge variant="secondary" size="sm">{tag}</Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right — title & excerpt */}
+                  <div class="md:col-span-6 md:col-start-7">
+                    <h3 class="text-[22px] font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
+                      {post.title}
+                    </h3>
+                    <p class="mt-2 text-sm text-muted-foreground line-clamp-2">
+                      {post.excerpt}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </a>
+        );
+      })}
+    </div>
+
+  </div>
+)}

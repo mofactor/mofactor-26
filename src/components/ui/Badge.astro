@@ -1,0 +1,14 @@
+---
+// Static twin of Badge.tsx (same classes via the shared recipe), no JS.
+import type { VariantProps } from "class-variance-authority";
+import { badgeVariants } from "./variants";
+import { cn } from "@/lib/utils";
+
+interface Props extends VariantProps<typeof badgeVariants> {
+  class?: string;
+}
+
+const { variant = "default", size = "sm", class: className } = Astro.props;
+---
+
+<span class={cn(badgeVariants({ variant, size }), className)} data-slot="badge"><slot /></span>

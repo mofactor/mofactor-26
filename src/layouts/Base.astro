@@ -1,0 +1,73 @@
+---
+import "@/styles/globals.css";
+import SEO, { type Props as SEOProps } from "@/components/SEO.astro";
+
+type Props = SEOProps;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: "Monofactor",
+      url: "https://monofactor.com",
+    },
+    {
+      "@type": "Person",
+      name: "Onur Oztaskiran",
+      url: "https://monofactor.com",
+      jobTitle: "AI Native Principal Product Designer & Creative Director",
+      sameAs: [
+        "https://dribbble.com/onuro",
+        "https://linkedin.com/in/onuro",
+        "https://instagram.com/onurozt",
+        "https://github.com/onuro",
+      ],
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="https://use.typekit.net/kmj5qkr.css" />
+    <!-- Before first paint: theme class (no flash) + `js` class that text effects use to pre-hide -->
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        root.classList.add("js");
+        try {
+          if (localStorage.getItem("theme") === "dark") root.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
+    <SEO {...Astro.props} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <slot name="head" />
+  </head>
+  <body class="selection:bg-zinc-700 selection:text-white dark:selection:bg-zinc-1000">
+    <slot />
+
+    <script is:inline>
+      (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+      Cal("init", {origin:"https://app.cal.com"});
+    </script>
+    {import.meta.env.PROD && (
+      <>
+        <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-HK8XV9BFHX"></script>
+        <script is:inline>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag("js", new Date());
+          gtag("config", "G-HK8XV9BFHX");
+        </script>
+      </>
+    )}
+  </body>
+</html>

@@ -1,19 +1,22 @@
-"use client";
-
 import { useActionState } from "react";
+import { actions } from "astro:actions";
+import { withState } from "@astrojs/react/actions";
 import { Mail, Send } from "lucide-react";
 import DualLineHeading from "@/components/ui/DualLineHeading";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Label } from "@/components/ui/Label";
-import { submitContact, type ContactState } from "@/app/actions/contact";
 
 export default function Contact() {
-  const [state, formAction, pending] = useActionState<ContactState, FormData>(
-    submitContact,
-    null,
-  );
+  // Astro Action (src/actions) wired into React 19's useActionState; still works without JS
+  const [result, formAction, pending] = useActionState(withState(actions.contact), {
+    data: { success: false, message: "" },
+    error: undefined,
+  });
+  const state = result.error
+    ? { success: false, message: "Something went wrong. Please try again later." }
+    : result.data;
 
   return (
     <div className="grid grid-cols-1 items-start gap-10 md:grid-cols-12 md:gap-16">

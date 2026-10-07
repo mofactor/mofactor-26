@@ -1,0 +1,90 @@
+---
+// Replaces Next's Metadata API. Every page gets absolute OG/Twitter URLs
+// (Next's metadataBase did this), a canonical, and the same site-wide defaults.
+
+export interface OgImage {
+  url: string;
+  width?: number;
+  height?: number;
+  alt?: string;
+}
+
+export interface Props {
+  /** Page title; rendered as "%s — Monofactor". Omit for the site default. */
+  title?: string;
+  description?: string;
+  /** Path for canonical + og:url; defaults to the current path */
+  path?: string;
+  ogType?: "website" | "article";
+  ogImages?: OgImage[];
+  twitterImages?: (string | { url: string; alt?: string })[];
+  publishedTime?: string;
+  tags?: string[];
+  noindex?: boolean;
+}
+
+const SITE_NAME = "Monofactor";
+const DEFAULT_TITLE = "Monofactor: AI Native Senior Product Designer Onur Oztaskiran Portfolio";
+const DEFAULT_DESCRIPTION =
+  "A digital portfolio of Onur Oztaskiran, AI Native Senior Product Designer & Creative Director.";
+const DEFAULT_OG_IMAGES: OgImage[] = [
+  { url: "/OG/Home-OG.jpg", width: 1200, height: 630, alt: "Monofactor — Onur Oztaskiran Portfolio" },
+  { url: "/og?title=Monofactor&subtitle=Portfolio+of+Onur+Oztaskiran", width: 1200, height: 630 },
+];
+const DEFAULT_TWITTER_IMAGES = ["/OG/Home-OG.jpg"];
+
+const {
+  title,
+  description = DEFAULT_DESCRIPTION,
+  path = Astro.url.pathname,
+  ogType = "website",
+  ogImages = DEFAULT_OG_IMAGES,
+  twitterImages = title ? ogImages.map((img) => img.url).slice(0, 1) : DEFAULT_TWITTER_IMAGES,
+  publishedTime,
+  tags,
+  noindex = false,
+} = Astro.props;
+
+const site = Astro.site ?? new URL("https://monofactor.com");
+const absolute = (url: string) => new URL(url, site).href;
+// Home is "https://monofactor.com" (no trailing slash), matching what Next emitted
+const pageUrl = path === "/" ? site.origin : absolute(path);
+
+const fullTitle = title ? `${title} — ${SITE_NAME}` : DEFAULT_TITLE;
+const socialTitle = title ?? DEFAULT_TITLE;
+const twitter = twitterImages.map((img) => (typeof img === "string" ? { url: img } : img));
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={pageUrl} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:locale" content="en_US" />
+<meta property="og:title" content={socialTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={pageUrl} />
+{ogImages.map((img) => (
+  <>
+    <meta property="og:image" content={absolute(img.url)} />
+    {img.width && <meta property="og:image:width" content={String(img.width)} />}
+    {img.height && <meta property="og:image:height" content={String(img.height)} />}
+    {img.alt && <meta property="og:image:alt" content={img.alt} />}
+  </>
+))}
+{publishedTime && <meta property="article:published_time" content={publishedTime} />}
+{tags?.map((tag) => <meta property="article:tag" content={tag} />)}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@onuro" />
+<meta name="twitter:creator" content="@onuro" />
+<meta name="twitter:title" content={socialTitle} />
+<meta name="twitter:description" content={description} />
+{twitter.map((img) => (
+  <>
+    <meta name="twitter:image" content={absolute(img.url)} />
+    {img.alt && <meta name="twitter:image:alt" content={img.alt} />}
+  </>
+))}

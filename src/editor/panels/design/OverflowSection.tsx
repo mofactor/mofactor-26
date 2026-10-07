@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback } from "react";
 import { type VariantKey } from "../../tailwind/design-parser";
 import { applyOverflowChange } from "../../tailwind/design-composer";

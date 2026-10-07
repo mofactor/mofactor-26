@@ -1,0 +1,120 @@
+---
+// Static port of About.tsx (no client JS). next/image `fill` → absolute, full-size <Image>.
+import { Image } from "astro:assets";
+import { Linkedin } from "lucide-react";
+import ButtonLink from "@/components/ui/ButtonLink.astro";
+import ToptalBadge from "@/components/ToptalBadge";
+import { img } from "@/lib/images";
+
+const fill = "absolute inset-0 h-full w-full";
+const widths = [640, 750, 828, 1080, 1200, 1920, 2048];
+const light = img("/assets/about/onuro-right.jpg");
+const dark = img("/assets/about/onuro-right-dark.jpg");
+---
+
+<div class="about">
+  {/* H2 in standard container */}
+  <div class="container">
+    <div class="md:grid md:grid-cols-12 md:gap-6">
+      <div class="md:col-span-12">
+        <h2 class="text-[30px] md:text-[36px] font-normal leading-[1.3]">
+          <span class="text-body opacity-75 dark:text-body-dark">
+            About me.
+          </span>
+          <br />
+          <span class="text-black dark:text-white">
+            Design that converts.
+          </span>
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  {/* Photo + text area in wider container */}
+  <div data-nav-theme="dark" class="max-md:bg-black sm:w-full sm:max-w-full md:mx-auto md:px-12 lg:max-w-[1280px] xl:max-w-[1536px]">
+
+    <div class="relative mt-12 md:mt-20">
+      <div class="relative grid md:grid-cols-2 min-h-[80svh]">
+        {/* Photo — absolute, spans full width behind both columns */}
+        <div class="content-visibility-auto z-10 rounded-2xl  overflow-hidden max-md:order-1 md:absolute md:inset-0 relative">
+          <Image
+            src={light}
+            alt="Onur Oztaskiran Portrait"
+            widths={widths}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            class={`${fill} object-cover max-md:hidden dark:hidden`}
+          />
+          <Image
+            src={dark}
+            alt="Onur Oztaskiran Portrait"
+            widths={widths}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            class={`${fill} object-cover dark:max-md:hidden hidden dark:block`}
+          />
+          <Image
+            src={light}
+            alt="Onur Oztaskiran Portrait Mobile"
+            widths={widths}
+            sizes="100vw"
+            class={`${fill} object-cover md:hidden dark:hidden`}
+          />
+          <Image
+            src={dark}
+            alt="Onur Oztaskiran Portrait Mobile"
+            widths={widths}
+            sizes="100vw"
+            class={`${fill} object-cover md:hidden hidden dark:max-md:block`}
+          />
+        </div>
+
+        {/* Text — left column, overlays the photo */}
+        <div class="relative z-10 flex items-center col-span-1 pt-16 pb-0 max-md:order-0 sm:px-12 md:col-start-1 md:py-32">
+          <div class="flex flex-col max-sm:px-6 md:mx-auto md:max-w-[360px] md:px-0">
+            <h3 class="mb-6 text-2xl text-white">
+              AI Native Designer. Maker. Design Thinker.
+            </h3>
+            <div class="prose leading-[1.65] text-white/80 [&>p]:mb-6 [&>p:last-child]:mb-0">
+              <p>
+                More than 15 years in design, I've taken key roles in shaping the digital presence of some of the most iconic platforms.
+              </p>
+              <p>
+                Having worked with cross-functional teams at various companies, I've practiced the importance of collaboration and communication in delivering successful projects.
+              </p>
+              <p>
+                My current focus is exploring how Artificial Intelligence can be used to
+                amplify our craft and accelerate the gap between idea and
+                execution.
+              </p>
+            </div>
+            <div class="flex gap-3 mt-8">
+              <ButtonLink
+                variant="outline"
+                href="https://www.linkedin.com/in/onuro/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-fit text-[14px] gap-3 py-5 !px-4 !border-none"
+              >
+                <Linkedin className="size-4" />
+                LinkedIn
+              </ButtonLink>
+              <ButtonLink
+                variant="ghost"
+                href="https://x.com/onuro"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-fit text-white text-[14px] gap-3 py-5 !px-4 !border-none"
+              >
+                <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                @onuro
+              </ButtonLink>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ToptalBadge className="right-24 bottom-24 origin-bottom-right scale-60 hover:mix-blend-normal" />
+    </div>
+  </div>
+
+</div>

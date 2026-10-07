@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect } from "react";
 import AnnotationOverlay from "./AnnotationOverlay";
 import EditorOverlay from "./EditorOverlay";

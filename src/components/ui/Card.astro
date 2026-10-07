@@ -1,0 +1,21 @@
+---
+// Static twin of Card in Card.tsx
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "@/lib/utils";
+
+type Props = HTMLAttributes<"div"> & { className?: string };
+
+const { className, class: cls, ...rest } = Astro.props;
+---
+
+<div
+  class={cn(
+    "card " +
+    "dark:shadow-md transition-all duration-200 bg-white md:gap-6 md:p-2 rounded-md shadow-card",
+    className,
+    cls,
+  )}
+  {...rest}
+>
+  <slot />
+</div>

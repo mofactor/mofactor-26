@@ -1,5 +1,3 @@
-"use client";
-
 import type { SourceLocation } from "../types";
 
 interface MetaInfoProps {

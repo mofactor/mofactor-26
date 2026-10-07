@@ -7,6 +7,12 @@ out/
 
 # build
 dist/
+dist-next/
+dist-prev/
+
+# astro
+.astro/
+.astro-cache/
 
 # env files
 .env

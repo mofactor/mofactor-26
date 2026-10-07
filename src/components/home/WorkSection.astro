@@ -1,0 +1,128 @@
+---
+// Static port of WorkSection.tsx: hover effects are CSS (group-hover); the only JS is
+// the nav-theme hint below and the lazy video (LazyVideo.astro).
+import DualLineHeading from "@/components/ui/DualLineHeading.astro";
+import LazyVideo from "@/components/ui/LazyVideo.astro";
+import { works } from "@/data/works";
+
+const [featured, ...items] = works;
+const videoType = (src?: string) => (src?.endsWith(".webm") ? "video/webm" : "video/mp4");
+---
+
+<div>
+  <DualLineHeading
+    topLine="Recent work."
+    bottomLine="From Pixels to Products."
+    className="mb-6"
+  />
+
+  <div class="mt-12 grid gap-4 sm:grid-cols-2 md:mt-16">
+    {/* Featured - Coder */}
+    <article data-nav-theme="dark" class="relative dark:mix-blend-none overflow-hidden rounded-2xl overflow-hidden sm:col-span-2 md:aspect-[16/9] dark:bg-black">
+
+      {/* Video container */}
+      <div class="relative z-10 max-md:aspect-[1/1] md:absolute md:inset-0">
+        <div class="h-full w-full">
+          <video
+            autoplay
+            loop
+            muted
+            playsinline
+            class="h-full w-full object-cover"
+          >
+            <source src={featured.videoSrc} type={videoType(featured.videoSrc)} />
+          </video>
+        </div>
+      </div>
+
+      {/* Text overlay */}
+      <div class="z-20 max-md:border-t max-md:border-white/5 max-md:px-6 max-md:py-6 absolute inset-0 flex flex-col justify-between p-6 dark:max-md:border-white/5">
+        <h3 class="text-[20px] max-md:mb-2 text-white">
+          {featured.title}
+        </h3>
+        <p class="max-w-sm text-[14px] text-white opacity-80">
+          {featured.description}
+        </p>
+      </div>
+
+      {/* Link overlay */}
+      <a
+        href={featured.href}
+        class="absolute inset-0 z-30 inline-block"
+      />
+    </article>
+
+    {/* Standard cards */}
+    {items.map((item) => {
+      const whiteTextOnHover = item.hoverSrc || (!item.featured && item.videoSrc);
+      return (
+        <article
+          data-dark-hover={item.darkHover ? "" : undefined}
+          class="group relative aspect-[1/1] overflow-hidden rounded-2xl bg-white md:col-span-1 dark:bg-zinc-950"
+        >
+          {/* Layer 1: Logo */}
+          <div class="absolute inset-0 z-10 flex items-center justify-center transition-transform duration-300 ease-out dark:invert">
+            <img
+              src={item.logoSrc}
+              alt={item.title}
+              loading="lazy"
+              class={`${item.logoClassName || "w-[45%]"} object-contain`}
+            />
+          </div>
+
+          {/* Layer 2: Hover content - image */}
+          {item.hoverSrc && (
+            <div class="content-visibility-auto absolute inset-0 z-20 transition-all duration-300 ease-out opacity-0 scale-[1.1] group-hover:opacity-100 group-hover:scale-100 pointer-events-none">
+              <img
+                src={item.hoverSrc}
+                alt={`${item.title} hover`}
+                loading="lazy"
+                class="h-full w-full object-cover"
+              />
+            </div>
+          )}
+
+          {/* Layer 2: Hover content - video */}
+          {!item.featured && item.videoSrc && (
+            <div class="content-visibility-auto absolute inset-0 z-20 transition-all duration-300 ease-out opacity-0 scale-[1.1] group-hover:opacity-100 group-hover:scale-100 pointer-events-none">
+              <LazyVideo
+                src={item.videoSrc}
+                posterSrc={item.videoPoster}
+                autoplay
+                loop
+                muted
+                playsinline
+                class="h-full w-full object-cover"
+              />
+            </div>
+          )}
+
+          {/* Layer 3: Text overlay */}
+          <div class="absolute inset-0 z-20 flex flex-col justify-between p-4">
+            <h3 class={`text-xl p-2 text-black transition-colors duration-300 ease-out dark:text-white ${whiteTextOnHover ? "group-hover:text-white" : ""}`}>
+              {item.title}
+            </h3>
+            <p class={`max-w-sm p-2 text-black/40 transition-all duration-300 ease-out dark:text-white/40 ${whiteTextOnHover ? "group-hover:text-white" : ""}`}>
+              {item.description}
+            </p>
+          </div>
+
+          {/* Layer 4: Link overlay */}
+          {item.href.startsWith("/") ? (
+            <a href={item.href} class="absolute inset-0 z-30" />
+          ) : (
+            <a href={item.href} target="_blank" rel="noopener noreferrer" class="absolute inset-0 z-30" />
+          )}
+        </article>
+      );
+    })}
+  </div>
+</div>
+
+<script>
+  // Cards with dark hover media tell BottomNav to switch to its dark style while hovered
+  document.querySelectorAll<HTMLElement>("[data-dark-hover]").forEach((card) => {
+    card.addEventListener("mouseenter", () => card.setAttribute("data-nav-theme", "dark"));
+    card.addEventListener("mouseleave", () => card.removeAttribute("data-nav-theme"));
+  });
+</script>

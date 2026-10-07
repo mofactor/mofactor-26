@@ -1,0 +1,57 @@
+---
+import Badge from "./Badge.astro";
+
+interface ProjectMetaItem {
+  label: string;
+  value: string;
+  asBadges?: boolean;
+}
+
+interface Props {
+  items: ProjectMetaItem[];
+  className?: string;
+  variant?: "stack" | "grid";
+}
+
+const { items, className = "", variant = "stack" } = Astro.props;
+const badges = (value: string) => value.split(",").map((v) => v.trim());
+---
+
+{variant === "grid" ? (
+  <div class={`flex flex-col md:grid md:grid-cols-2 gap-3 ${className}`}>
+    {items.map((item, i) => (
+      <div
+        class={`space-y-2.5 leading-[1.5] p-6 rounded-lg bg-white/95 dark:bg-background/88 backdrop-blur-xl ${i === items.length - 1 && items.length % 2 !== 0 ? "col-span-2" : ""
+          }`}
+      >
+        <p class="text-muted-foreground uppercase tracking-wider text-xs font-medium">
+          {item.label}
+        </p>
+        {item.asBadges ? (
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            {badges(item.value).map((v) => <Badge variant="secondary" size="md">{v}</Badge>)}
+          </div>
+        ) : (
+          <p>{item.value}</p>
+        )}
+      </div>
+    ))}
+  </div>
+) : (
+  <div class={` space-y-8 p-8 ${className}`}>
+    {items.map((item) => (
+      <div class="space-y-2.5 leading-[1.5]">
+        <p class="text-muted-foreground uppercase tracking-wider text-xs font-medium">
+          {item.label}
+        </p>
+        {item.asBadges ? (
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            {badges(item.value).map((v) => <Badge variant="secondary" size="md">{v}</Badge>)}
+          </div>
+        ) : (
+          <p>{item.value}</p>
+        )}
+      </div>
+    ))}
+  </div>
+)}

@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { SPACING_TOKENS, TOKEN_TO_PX, isSpacingToken } from "../../tailwind/spacing-map";

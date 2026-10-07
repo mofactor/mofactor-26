@@ -1,0 +1,27 @@
+---
+// Static twin of LazyVideo.tsx: poster now, <video> once near the viewport.
+import type { LazyVideoOptions } from "@/lib/fx/lazyVideo";
+
+interface Props {
+  src: string;
+  posterSrc?: string;
+  class?: string;
+  style?: string;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  playsinline?: boolean;
+}
+
+const { src, posterSrc, class: className, style, autoplay, loop, muted, playsinline } = Astro.props;
+const options: LazyVideoOptions = { src, className, style, autoplay, loop, muted, playsInline: playsinline };
+---
+
+<div class={className} data-fx="lazy-video" data-fx-auto data-fx-options={JSON.stringify(options)}>
+  {posterSrc && <img src={posterSrc} alt="" loading="lazy" class={className} />}
+</div>
+
+<script>
+  import { initAutoFx } from "@/lib/fx";
+  initAutoFx();
+</script>

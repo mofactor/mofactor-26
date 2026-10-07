@@ -1,0 +1,57 @@
+---
+import BlinkText from "./BlinkText.astro";
+import ThinkingText from "./ThinkingText.astro";
+
+interface Props {
+  line1: string;
+  line1ClassName?: string;
+  line2?: string;
+  line2ClassName?: string;
+  thinkingWords?: string[];
+  blink?: boolean;
+}
+
+const {
+  line1,
+  line1ClassName = "text-zinc-400 dark:text-zinc-500",
+  line2,
+  line2ClassName = "text-foreground",
+  thinkingWords,
+  blink = false,
+} = Astro.props;
+---
+
+<div>
+  {thinkingWords && (
+    <div class="mb-2">
+      <ThinkingText class="text-sm text-zinc-400 dark:text-zinc-500 font-mono" words={thinkingWords} />
+    </div>
+  )}
+  <h1 class="text-[32px] md:text-[48px] font-normal leading-[1.25]">
+    {blink ? (
+      <BlinkText
+        class={line1ClassName}
+        text={line1}
+        mode="words"
+        timingConfig={{ fadeTime: 0.35, randomHoldMax: 0.5, blinkTimeMax: 1 }}
+      />
+    ) : (
+      <span class={line1ClassName}>{line1}</span>
+    )}
+    {line2 && (
+      <>
+        <br />
+        {blink ? (
+          <BlinkText
+            class={line2ClassName}
+            text={line2}
+            mode="words"
+            timingConfig={{ fadeTime: 0.5, randomHoldMax: 0.75, blinkTimeMax: 1.5 }}
+          />
+        ) : (
+          <span class={line2ClassName}>{line2}</span>
+        )}
+      </>
+    )}
+  </h1>
+</div>

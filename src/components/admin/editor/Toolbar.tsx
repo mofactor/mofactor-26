@@ -1,5 +1,3 @@
-"use client";
-
 import { memo, useEffect, useReducer, useState } from "react";
 import { type Editor } from "@tiptap/react";
 import { Button } from "@/components/ui/Button";

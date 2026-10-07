@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState, useCallback, useRef, Fragment } from "react";
 import { animate, createDraggable, createSpring } from "animejs";
 import { useTheme } from "@/hooks/useTheme";

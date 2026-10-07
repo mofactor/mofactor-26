@@ -1,5 +1,3 @@
-"use client";
-
 import { Collapsible as CollapsiblePrimitive } from "@base-ui/react/collapsible";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";

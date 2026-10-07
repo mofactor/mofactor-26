@@ -1,0 +1,19 @@
+---
+import type { BlinkOptions } from "@/lib/fx/blink";
+
+interface Props extends Omit<BlinkOptions, "onComplete"> {
+  text: string;
+  class?: string;
+  /** Alias of `class`, so pages converted from JSX keep working */
+  className?: string;
+}
+
+const { text, class: cls, className = cls, ...options } = Astro.props;
+---
+
+<span class={className} data-fx="blink" data-fx-auto data-fx-options={JSON.stringify(options)}>{text}</span>
+
+<script>
+  import { initAutoFx } from "@/lib/fx";
+  initAutoFx();
+</script>

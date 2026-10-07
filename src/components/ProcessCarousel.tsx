@@ -1,7 +1,4 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Carousel,
@@ -11,7 +8,9 @@ import {
 } from "@/components/ui/Carousel";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { Img } from "@/components/ui/Img";
 import { Lightbox, type LightboxImage } from "@/components/ui/Lightbox";
+import type { IslandImage } from "@/lib/island-image";
 import AutoScroll from "embla-carousel-auto-scroll";
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { cn } from "@/lib/utils";
@@ -20,6 +19,8 @@ type ProcessSlide = {
   src: string;
   alt: string;
   navTheme?: "dark" | "light";
+  /** Pre-optimized by the .astro page (lib/images.ts); `src` stays the original for the lightbox */
+  image: IslandImage;
 };
 
 type FadeMask = "left" | "right" | "both";
@@ -149,11 +150,9 @@ export default function ProcessCarousel({ slides, fadeMask, disableFadeMaskDark,
                 {...(lightbox ? { onClick: () => { setLbIndex(i); setLbOpen(true); } } : {})}
               >
                 <CardContent className="p-0">
-                  <Image
-                    src={slide.src}
+                  <Img
+                    image={slide.image}
                     alt={slide.alt}
-                    width={1920}
-                    height={1080}
                     className="object-cover rounded-lg"
                   />
                 </CardContent>

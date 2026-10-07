@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useMemo, useState } from "react";
 import { type SpacingSides, type VariantKey } from "../../tailwind/design-parser";
 import { applyPaddingChange, applyPaddingAxisChange } from "../../tailwind/design-composer";

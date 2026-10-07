@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useState } from "react";
 import { useEditor } from "./EditorProvider";
 import { fetchHistory, clearServerHistory } from "./engine/sync";

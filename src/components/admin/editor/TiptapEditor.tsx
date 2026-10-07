@@ -1,5 +1,3 @@
-"use client";
-
 import { useEditor, EditorContent, ReactRenderer, Extension } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { StylableImage } from "./extensions/ImageExtension";

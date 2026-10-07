@@ -1,5 +1,3 @@
-"use client";
-
 import { useRef, useState, useLayoutEffect, useCallback } from "react";
 import { animate } from "animejs";
 import { cn } from "@/lib/utils";

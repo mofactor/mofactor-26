@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Sun, Moon, Phone } from "lucide-react";
 import { Switch } from "@/components/ui/Switch";

@@ -1,0 +1,38 @@
+---
+// Static twin of MetaLine in BitSlider.tsx: "date · category · read time" or "Coming soon · category"
+import type { DesignBitItem } from "@/data/designBits";
+
+interface Props {
+  item: DesignBitItem;
+}
+
+const { item } = Astro.props;
+---
+
+{item.comingSoon ? (
+  <>
+    <span>Coming soon</span>
+    {item.category && (
+      <>
+        <span class="mx-[0.35em]">·</span>
+        <span>{item.category}</span>
+      </>
+    )}
+  </>
+) : (
+  <>
+    {item.date && <span>{item.date}</span>}
+    {item.category && (
+      <>
+        {item.date && <span class="mx-[0.35em]">·</span>}
+        <span>{item.category}</span>
+      </>
+    )}
+    {item.readTime && (
+      <>
+        <span class="mx-[0.35em]">·</span>
+        <span>{item.readTime}</span>
+      </>
+    )}
+  </>
+)}

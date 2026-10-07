@@ -1,5 +1,3 @@
-"use client";
-
 import { type ElementType } from "react";
 import BlinkText, { type BlinkTimingConfig } from "@/components/ui/BlinkText";
 import ThinkingText from "@/components/ui/ThinkingText";

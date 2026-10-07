@@ -1,0 +1,27 @@
+---
+import { Asterisk } from "lucide-react";
+import type { ThinkingOptions } from "@/lib/fx/thinking";
+
+interface Props extends ThinkingOptions {
+  class?: string;
+}
+
+const { class: className, ...options } = Astro.props;
+---
+
+<span
+  class:list={["inline-flex items-center uppercase gap-1.5", className]}
+  data-fx="thinking"
+  data-fx-auto
+  data-fx-options={JSON.stringify(options)}
+>
+  <Asterisk size={24} strokeWidth={2.5} data-fx-icon="" />
+  <span data-fx-text></span>
+  <span data-fx-cursor class="inline-block w-[12px] h-[1.1em] bg-current align-text-bottom mx-px"></span>
+  ...
+</span>
+
+<script>
+  import { initAutoFx } from "@/lib/fx";
+  initAutoFx();
+</script>

@@ -1,5 +1,3 @@
-"use client";
-
 import dynamic from "next/dynamic";
 
 const DevEditor = dynamic(() => import("@/editor"), { ssr: false });

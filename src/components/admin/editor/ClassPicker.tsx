@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useMemo, useRef } from "react";
 import { Combobox } from "@base-ui/react/combobox";
 import { X } from "lucide-react";
