@@ -1,0 +1,7 @@
+[mcp_servers.editor-annotations]
+command = "npx"
+args = [
+    "tsx",
+    "src/editor/server/index.ts",
+    "--mcp-only",
+]
