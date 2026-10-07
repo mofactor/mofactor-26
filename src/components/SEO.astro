@@ -12,6 +12,8 @@ export interface OgImage {
 export interface Props {
   /** Page title; rendered as "%s — Monofactor". Omit for the site default. */
   title?: string;
+  /** Render `title` as-is, without the suffix (blog posts: their SEO titles are written to length) */
+  absoluteTitle?: boolean;
   description?: string;
   /** Path for canonical + og:url; defaults to the current path */
   path?: string;
@@ -43,6 +45,7 @@ const {
   publishedTime,
   tags,
   noindex = false,
+  absoluteTitle = false,
 } = Astro.props;
 
 const site = Astro.site ?? new URL("https://monofactor.com");
@@ -50,7 +53,7 @@ const absolute = (url: string) => new URL(url, site).href;
 // Home is "https://monofactor.com" (no trailing slash), matching what Next emitted
 const pageUrl = path === "/" ? site.origin : absolute(path);
 
-const fullTitle = title ? `${title} — ${SITE_NAME}` : DEFAULT_TITLE;
+const fullTitle = title ? (absoluteTitle ? title : `${title} — ${SITE_NAME}`) : DEFAULT_TITLE;
 const socialTitle = title ?? DEFAULT_TITLE;
 const twitter = twitterImages.map((img) => (typeof img === "string" ? { url: img } : img));
 ---

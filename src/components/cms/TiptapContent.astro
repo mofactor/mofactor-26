@@ -1,0 +1,33 @@
+---
+// Public blog renderer: post JSON → static HTML. Only media hydrate (image lightbox,
+// video player). The admin preview keeps the React twin (TiptapRenderer.tsx); both
+// share render-helpers.ts.
+import TiptapNodeView from "./TiptapNode.astro";
+import type { TiptapNode } from "./render-helpers";
+import { collectClassesFromJSON, generateVariantArbitraryCSS } from "@/lib/tw-arbitrary";
+
+interface Props {
+  content: string; // JSON string
+}
+
+const { content } = Astro.props;
+
+let doc: TiptapNode | null = null;
+try {
+  doc = JSON.parse(content);
+} catch {
+  doc = null;
+}
+
+// Runtime CSS for variant+arbitrary classes (e.g. dark:border-[12px])
+const variantCSS = doc?.content ? generateVariantArbitraryCSS(collectClassesFromJSON(doc)) : "";
+---
+
+{doc === null ? (
+  <p class="text-zinc-500">Unable to render content.</p>
+) : doc.content ? (
+  <div class="blog-prose">
+    {variantCSS && <style is:inline set:html={variantCSS} />}
+    {doc.content.map((node) => <TiptapNodeView node={node} />)}
+  </div>
+) : null}

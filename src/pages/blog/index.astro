@@ -1,0 +1,55 @@
+---
+// Rendered per request from Convex (was client-rendered with a "Loading..." state)
+export const prerender = false;
+
+import type { FunctionReturnType } from "convex/server";
+import Base from "@/layouts/Base.astro";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer.astro";
+import BlogPostCard from "@/components/blog/BlogPostCard.astro";
+import { convex } from "@/lib/convex-server";
+import { api } from "@convex/_generated/api";
+
+let posts: FunctionReturnType<typeof api.posts.list> = [];
+try {
+  posts = convex ? await convex.query(api.posts.list, {}) : [];
+} catch {
+  // Convex unavailable: show the empty state rather than an error page
+}
+---
+
+<Base
+  title="Blog"
+  description="Thoughts on design, development, and building digital products."
+  path="/blog"
+>
+  <Header client:load />
+  <main class="container mx-auto min-h-screen px-6 pt-24 pb-16 md:px-12">
+    <div class="mx-auto max-w-3xl">
+      <h1 class="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+        Blog
+      </h1>
+      <p class="mt-2 text-zinc-500 dark:text-zinc-400">
+        Thoughts on design, development, and building digital products.
+      </p>
+
+      <div class="mt-10 space-y-6">
+        {posts.length === 0 && (
+          <p class="text-sm text-zinc-400">No posts yet.</p>
+        )}
+
+        {posts.map((post) => (
+          <BlogPostCard
+            title={post.title}
+            slug={post.slug}
+            excerpt={post.excerpt}
+            publishedAt={post.publishedAt}
+            tags={post.tags}
+            coverImageUrl={post.coverImageUrl}
+          />
+        ))}
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Base>

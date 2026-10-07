@@ -10,19 +10,14 @@ import {
   collectClassesFromJSON,
 } from "@/lib/tw-arbitrary";
 import { MfLogo } from "@/components/ui/MfLogo";
+import {
+  getBlockClasses,
+  getBlockStyle,
+  getBlockStyleNoAlign,
+  type TiptapMark,
+  type TiptapNode,
+} from "./render-helpers";
 
-interface TiptapNode {
-  type: string;
-  attrs?: Record<string, any>;
-  content?: TiptapNode[];
-  text?: string;
-  marks?: TiptapMark[];
-}
-
-interface TiptapMark {
-  type: string;
-  attrs?: Record<string, any>;
-}
 
 interface TiptapRendererProps {
   content: string; // JSON string
@@ -225,42 +220,6 @@ function applyMark(
     default:
       return element;
   }
-}
-
-function getAlignStyle(
-  attrs?: Record<string, any>
-): React.CSSProperties | undefined {
-  if (attrs?.textAlign && attrs.textAlign !== "left") {
-    return { textAlign: attrs.textAlign };
-  }
-  return undefined;
-}
-
-/** Get combined className (regular classes) for a block node */
-function getBlockClasses(attrs?: Record<string, any>): string {
-  if (!attrs?.className) return "";
-  const { classes } = parseArbitraryClasses(attrs.className);
-  return classes;
-}
-
-/** Get combined inline style (arbitrary values + textAlign) for a block node */
-function getBlockStyle(
-  attrs?: Record<string, any>
-): React.CSSProperties | undefined {
-  const align = getAlignStyle(attrs);
-  if (!attrs?.className) return align;
-  const { style } = parseArbitraryClasses(attrs.className);
-  const merged = { ...style, ...align };
-  return Object.keys(merged).length > 0 ? merged : undefined;
-}
-
-/** Get inline style without textAlign (for list/blockquote elements) */
-function getBlockStyleNoAlign(
-  attrs?: Record<string, any>
-): React.CSSProperties | undefined {
-  if (!attrs?.className) return undefined;
-  const { style } = parseArbitraryClasses(attrs.className);
-  return Object.keys(style).length > 0 ? style : undefined;
 }
 
 // Re-export renderNode for use by child renderers

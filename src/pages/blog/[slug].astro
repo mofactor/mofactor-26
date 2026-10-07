@@ -1,0 +1,150 @@
+---
+// Rendered per request from Convex. The article is static HTML (was client-rendered,
+// so crawlers saw "Loading..."); only the share bar, image lightboxes and video
+// players hydrate. Unknown slugs now return a real 404.
+export const prerender = false;
+
+import { ArrowLeft } from "lucide-react";
+import Base from "@/layouts/Base.astro";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer.astro";
+import Badge from "@/components/ui/Badge.astro";
+import TiptapContent from "@/components/cms/TiptapContent.astro";
+import { ShareBar } from "@/components/blog/ShareBar";
+import { convex } from "@/lib/convex-server";
+import { api } from "@convex/_generated/api";
+
+const slug = Astro.params.slug!;
+
+let post: Awaited<ReturnType<typeof getPost>> = null;
+async function getPost() {
+  return convex ? await convex.query(api.posts.getBySlug, { slug }) : null;
+}
+try {
+  post = await getPost();
+} catch {
+  post = null;
+}
+
+if (!post) Astro.response.status = 404;
+
+const title = post ? post.seoTitle || post.title : "Post not found";
+const description = post ? post.seoMetaDescription || post.excerpt : undefined;
+const fallbackOg = post ? `/og?title=${encodeURIComponent(post.title)}&subtitle=Blog` : "";
+const ogImages = post
+  ? [
+      post.coverImageUrl
+        ? { url: post.coverImageUrl, width: 1200, height: 630, alt: post.title }
+        : { url: fallbackOg, width: 1200, height: 630 },
+    ]
+  : undefined;
+const twitterImages = post
+  ? [post.coverImageUrl ? { url: post.coverImageUrl, alt: post.title } : { url: fallbackOg, alt: post.title }]
+  : undefined;
+const publishedTime = post?.publishedAt ? new Date(post.publishedAt).toISOString() : undefined;
+
+const jsonLd = post && {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.title,
+  description: post.seoMetaDescription || post.excerpt,
+  ...(post.coverImageUrl && { image: post.coverImageUrl }),
+  ...(publishedTime && { datePublished: publishedTime }),
+  author: {
+    "@type": "Person",
+    name: "Onur Oztaskiran",
+    url: "https://monofactor.com",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "Monofactor",
+    url: "https://monofactor.com",
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": `https://monofactor.com/blog/${slug}`,
+  },
+};
+---
+
+<Base
+  title={title}
+  absoluteTitle={!!post}
+  description={description}
+  path={`/blog/${slug}`}
+  ogType={post ? "article" : "website"}
+  ogImages={ogImages}
+  twitterImages={twitterImages}
+  publishedTime={publishedTime}
+  tags={post?.tags ?? undefined}
+  noindex={!post}
+>
+  {jsonLd && <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  <Header client:load />
+  <main class="container mx-auto min-h-screen px-6 pt-24 pb-16 md:px-12">
+    {post ? (
+      <article class="blog-prose mx-auto max-w-5xl pb-24">
+        <header class="text-left pt-12">
+          <a
+            href="/"
+            class="mb-3 inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+          >
+            <ArrowLeft className="size-3.5" />
+            Home
+          </a>
+          <h1 class="mt-0 text-4xl md:text-5xl md:leading-14 text-zinc-900 dark:text-zinc-100">
+            {post.title}
+          </h1>
+
+          <div class="mt-5 pb-4 flex items-center gap-3">
+            {post.publishedAt && (
+              <time class="text-sm text-zinc-400">
+                {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  timeZone: "UTC",
+                })}
+              </time>
+            )}
+
+            {post.tags && post.tags.length > 0 && (
+              <div class="flex gap-1">
+                {post.tags.map((tag) => (
+                  <Badge variant="secondary" size="sm">{tag}</Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        </header>
+
+        {post.coverImageUrl && (
+          <img
+            src={post.coverImageUrl}
+            alt={post.title}
+            class="wide mt-8 aspect-video w-full rounded-xl object-cover mb-10"
+          />
+        )}
+
+        <div class="mt-10 full">
+          <ShareBar client:idle title={post.title} slug={slug} />
+          <TiptapContent content={post.content} />
+        </div>
+      </article>
+    ) : (
+      <div class="mx-auto max-w-2xl py-20 text-center">
+        <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+          Post not found
+        </h1>
+        <a
+          href="/blog"
+          class="mt-4 inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+        >
+          <ArrowLeft className="size-3.5" />
+          Back to blog
+        </a>
+      </div>
+    )}
+  </main>
+  <Footer />
+</Base>

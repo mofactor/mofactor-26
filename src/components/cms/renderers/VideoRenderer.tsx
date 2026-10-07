@@ -1,17 +1,6 @@
 import { VideoPlayer } from "@/components/ui/VideoPlayer";
 import { parseArbitraryClasses } from "@/lib/tw-arbitrary";
-
-const FIGURE_CLASSES = new Set(["wide", "full"]);
-
-function splitClasses(cls: string) {
-  const parts = cls.split(/\s+/).filter(Boolean);
-  const figure: string[] = [];
-  const inner: string[] = [];
-  for (const c of parts) {
-    (FIGURE_CLASSES.has(c) ? figure : inner).push(c);
-  }
-  return { figure: figure.join(" "), inner: inner.join(" ") };
-}
+import { splitFigureClasses } from "../render-helpers";
 
 interface VideoRendererProps {
   attrs?: Record<string, any>;
@@ -21,7 +10,7 @@ export function VideoRenderer({ attrs }: VideoRendererProps) {
   if (!attrs?.src) return null;
 
   const { classes, style } = parseArbitraryClasses(attrs.className || "");
-  const { figure: figCls, inner: innerCls } = splitClasses(classes);
+  const { figure: figCls, inner: innerCls } = splitFigureClasses(classes);
 
   return (
     <figure data-class={attrs.className || ""} className={figCls || undefined}>

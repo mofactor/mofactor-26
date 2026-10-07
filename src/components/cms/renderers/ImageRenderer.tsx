@@ -1,18 +1,6 @@
 import { parseArbitraryClasses } from "@/lib/tw-arbitrary";
+import { splitFigureClasses } from "../render-helpers";
 import { Lightbox } from "@/components/ui/Lightbox";
-
-/** Classes that control layout width — must live on <figure> (direct child of .blog-prose) */
-const FIGURE_CLASSES = new Set(["wide", "full"]);
-
-function splitClasses(cls: string) {
-  const parts = cls.split(/\s+/).filter(Boolean);
-  const figure: string[] = [];
-  const img: string[] = [];
-  for (const c of parts) {
-    (FIGURE_CLASSES.has(c) ? figure : img).push(c);
-  }
-  return { figure: figure.join(" "), img: img.join(" ") };
-}
 
 interface ImageRendererProps {
   attrs?: Record<string, any>;
@@ -22,7 +10,7 @@ export function ImageRenderer({ attrs }: ImageRendererProps) {
   if (!attrs?.src) return null;
 
   const { classes, style } = parseArbitraryClasses(attrs.className || "");
-  const { figure: figCls, img: imgCls } = splitClasses(classes);
+  const { figure: figCls, inner: imgCls } = splitFigureClasses(classes);
 
   const imgClasses = ["max-w-full", imgCls || "rounded-lg"].filter(Boolean).join(" ");
   const hasDarkSrc = !!attrs.darkSrc;

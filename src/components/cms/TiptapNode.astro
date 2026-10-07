@@ -1,0 +1,165 @@
+---
+// One Tiptap block node → HTML; recurses for children with Astro.self.
+// Mirrors renderNode() in TiptapRenderer.tsx.
+import { Lightbox } from "@/components/ui/Lightbox";
+import { VideoPlayer } from "@/components/ui/VideoPlayer";
+import { MfLogo } from "@/components/ui/MfLogo";
+import { parseArbitraryClasses } from "@/lib/tw-arbitrary";
+import {
+  COLS_MAP,
+  getBlockClasses,
+  getBlockStyle,
+  getBlockStyleNoAlign,
+  hasInlineContent,
+  inlineToHtml,
+  splitFigureClasses,
+  toStyleAttr,
+  type TiptapNode,
+} from "./render-helpers";
+
+interface Props {
+  node: TiptapNode;
+}
+
+const { node } = Astro.props;
+const attrs = node.attrs;
+
+const cls = getBlockClasses(attrs) || undefined;
+const style = toStyleAttr(getBlockStyle(attrs));
+const styleNoAlign = toStyleAttr(getBlockStyleNoAlign(attrs));
+const Heading = `h${Math.min(Math.max(attrs?.level || 1, 1), 5)}`;
+
+// image / video
+const parsed = parseArbitraryClasses(attrs?.className || "");
+const split = splitFigureClasses(parsed.classes);
+const mediaStyle = toStyleAttr(parsed.style);
+const imgClasses = ["max-w-full", split.inner || "rounded-lg"].filter(Boolean).join(" ");
+const hasDarkSrc = !!attrs?.darkSrc;
+const caption = attrs?.title && attrs.showCaption !== false ? attrs.title : null;
+
+// logoDivider
+const ldParts = node.type === "logoDivider" ? parsed.classes.split(/\s+/).filter(Boolean) : [];
+const ldFigure = ldParts.filter((c) => c === "wide" || c === "full").join(" ");
+const ldInner = ldParts.filter((c) => c !== "wide" && c !== "full").join(" ");
+
+// codeBlock
+const code = node.content?.map((n) => n.text || "").join("") || "";
+
+// columns
+const colsClass = `grid ${COLS_MAP[attrs?.count || 2] || "grid-cols-2"} ${attrs?.gap || "gap-6"} ${parsed.classes}`.trim();
+---
+
+{node.type === "paragraph" && hasInlineContent(node) && (
+  <p class={cls} style={style} set:html={inlineToHtml(node.content)} />
+)}
+
+{node.type === "heading" && (
+  <Heading class={cls} style={style} set:html={inlineToHtml(node.content)} />
+)}
+
+{node.type === "bulletList" && (
+  <ul class={cls} style={styleNoAlign}>
+    {node.content?.map((child) => <Astro.self node={child} />)}
+  </ul>
+)}
+
+{node.type === "orderedList" && (
+  <ol class={cls} style={styleNoAlign}>
+    {node.content?.map((child) => <Astro.self node={child} />)}
+  </ol>
+)}
+
+{node.type === "listItem" && (
+  <li class={cls} style={styleNoAlign}>
+    {node.content?.map((child) => <Astro.self node={child} />)}
+  </li>
+)}
+
+{node.type === "blockquote" && (
+  <blockquote class={cls} style={styleNoAlign}>
+    {node.content?.map((child) => <Astro.self node={child} />)}
+  </blockquote>
+)}
+
+{node.type === "codeBlock" && (
+  <pre data-language={attrs?.language || undefined}><code>{code}</code></pre>
+)}
+
+{node.type === "image" && attrs?.src && (
+  <figure data-class={attrs.className || ""} class={split.figure || undefined}>
+    {attrs.href ? (
+      <a
+        href={attrs.href}
+        target={attrs.target || undefined}
+        rel={attrs.target === "_blank" ? "noopener noreferrer" : undefined}
+      >
+        <img src={attrs.src} alt={attrs.alt || ""} class={hasDarkSrc ? `${imgClasses} dark:hidden` : imgClasses} style={mediaStyle} />
+        {hasDarkSrc && <img src={attrs.darkSrc} alt={attrs.alt || ""} class={`${imgClasses} hidden dark:block`} style={mediaStyle} />}
+      </a>
+    ) : attrs.lightbox ? (
+      <>
+        <Lightbox client:idle images={[{ src: attrs.src, alt: attrs.alt || "" }]}>
+          <img src={attrs.src} alt={attrs.alt || ""} class={hasDarkSrc ? `${imgClasses} dark:hidden` : imgClasses} style={mediaStyle} />
+        </Lightbox>
+        {hasDarkSrc && (
+          <Lightbox client:idle images={[{ src: attrs.darkSrc, alt: attrs.alt || "" }]}>
+            <img src={attrs.darkSrc} alt={attrs.alt || ""} class={`${imgClasses} hidden dark:block`} style={mediaStyle} />
+          </Lightbox>
+        )}
+      </>
+    ) : (
+      <>
+        <img src={attrs.src} alt={attrs.alt || ""} class={hasDarkSrc ? `${imgClasses} dark:hidden` : imgClasses} style={mediaStyle} />
+        {hasDarkSrc && <img src={attrs.darkSrc} alt={attrs.alt || ""} class={`${imgClasses} hidden dark:block`} style={mediaStyle} />}
+      </>
+    )}
+    {caption && <figcaption class="mt-2 text-center text-sm text-zinc-500">{caption}</figcaption>}
+  </figure>
+)}
+
+{node.type === "video" && attrs?.src && (
+  <figure data-class={attrs.className || ""} class={split.figure || undefined}>
+    <VideoPlayer
+      client:visible
+      src={attrs.src}
+      poster={attrs.poster || undefined}
+      autoplay={attrs.autoplay}
+      muted={attrs.muted}
+      loop={attrs.loop}
+      hideControls={attrs.hideControls}
+      className={split.inner}
+      style={parsed.style}
+    />
+    {caption && <figcaption class="mt-2 text-center text-sm text-zinc-500">{caption}</figcaption>}
+  </figure>
+)}
+
+{node.type === "horizontalRule" && <hr />}
+
+{node.type === "logoDivider" && (
+  <div class={ldFigure || undefined}>
+    <div class={`flex items-center gap-4 my-8${ldInner ? ` ${ldInner}` : ""}`} style={mediaStyle}>
+      <hr class="flex-1 border-t border-zinc-200 dark:border-zinc-800" />
+      <MfLogo className="h-5 w-auto text-zinc-200 dark:text-zinc-800" />
+      <hr class="flex-1 border-t border-zinc-200 dark:border-zinc-800" />
+    </div>
+  </div>
+)}
+
+{node.type === "columns" && (
+  <div data-type="columns" class={colsClass} style={mediaStyle}>
+    {node.content?.map((child) => <Astro.self node={child} />)}
+  </div>
+)}
+
+{node.type === "column" && (
+  <div data-type="column" class={parsed.classes} style={mediaStyle}>
+    {node.content?.map((child) => <Astro.self node={child} />)}
+  </div>
+)}
+
+{node.type === "styledBlock" && (
+  <div data-type="styled-block" class={parsed.classes} style={mediaStyle}>
+    {node.content?.map((child) => <Astro.self node={child} />)}
+  </div>
+)}
