@@ -39,13 +39,53 @@ function findNearestFiber(el: HTMLElement): any | null {
 }
 
 /**
+ * Astro's dev compiler stamps every element from an .astro template with
+ * data-astro-source-file / data-astro-source-loc ("line:col"). Elements rendered by a
+ * React island don't have them; for those, fall back to the island's component file.
+ */
+type AstroSource = { file: string; loc: string | null };
+
+/** The stamp for one element: captured early by the factorframe integration (Astro's dev
+ *  toolbar strips the attributes after load), or still on the element. */
+function readAstroSource(el: Element): AstroSource | null {
+  const captured = (window as { __factorframeSources?: WeakMap<Element, AstroSource> }).__factorframeSources?.get(el);
+  if (captured) return captured;
+  const file = el.getAttribute("data-astro-source-file");
+  return file ? { file, loc: el.getAttribute("data-astro-source-loc") } : null;
+}
+
+function getAstroSourceLocation(el: HTMLElement): SourceLocation | null {
+  const island = el.closest("astro-island");
+  // Nearest stamped ancestor, skipping Astro's own components (node_modules/astro/components/Image.astro)
+  let node: Element | null = el;
+  let source: AstroSource | null = null;
+  for (; node; node = node.parentElement) {
+    source = readAstroSource(node);
+    if (source && !source.file.includes("/node_modules/")) break;
+  }
+  // Inside an island, only Astro-rendered slot content (inside the island) is stamped
+  if (node && source && (!island || island.contains(node))) {
+    const [line, col] = (source.loc ?? "").split(":").map(Number);
+    return { fileName: source.file, lineNumber: line || 0, columnNumber: col || 0 };
+  }
+  const componentUrl = island?.getAttribute("component-url");
+  if (componentUrl) {
+    return { fileName: componentUrl.replace(/^\//, "").split("?")[0], lineNumber: 0, columnNumber: 0 };
+  }
+  return null;
+}
+
+/**
  * Walk up the fiber tree from a DOM element to find _debugSource.
  * Returns the first source location found, which corresponds to
  * the JSX element that rendered this DOM node.
  */
 export function getSourceLocation(el: HTMLElement): SourceLocation | null {
+  const astro = getAstroSourceLocation(el);
+  if (astro && astro.lineNumber > 0) return astro;
+
   let fiber = findNearestFiber(el);
-  if (!fiber) return null;
+  if (!fiber) return astro;
 
   const maxDepth = 20;
   let depth = 0;
@@ -62,6 +102,9 @@ export function getSourceLocation(el: HTMLElement): SourceLocation | null {
     fiber = fiber.return;
     depth++;
   }
+
+  // React 19 has no _debugSource: at least name the island's component file
+  if (astro) return astro;
 
   return null;
 }
@@ -175,6 +218,10 @@ export function getComponentPropsStack(el: HTMLElement): ComponentPropInfo[] {
  */
 export function getSourceLocationStack(el: HTMLElement): SourceLocation[] {
   const stack: SourceLocation[] = [];
+  // .astro elements: one exact location (the commit route reports .astro as unsupported for now)
+  const astro = getAstroSourceLocation(el);
+  if (astro && astro.lineNumber > 0) return [astro];
+
   let fiber = findNearestFiber(el);
   if (!fiber) return stack;
 

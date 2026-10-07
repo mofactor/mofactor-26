@@ -27,7 +27,7 @@ const attrs = node.attrs;
 const cls = getBlockClasses(attrs) || undefined;
 const style = toStyleAttr(getBlockStyle(attrs));
 const styleNoAlign = toStyleAttr(getBlockStyleNoAlign(attrs));
-const Heading = `h${Math.min(Math.max(attrs?.level || 1, 1), 5)}`;
+const Heading = `h${Math.min(Math.max(attrs?.level || 1, 1), 5)}` as "h1" | "h2" | "h3" | "h4" | "h5";
 
 // image / video
 const parsed = parseArbitraryClasses(attrs?.className || "");

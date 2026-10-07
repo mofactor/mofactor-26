@@ -7,7 +7,7 @@ import type { ServerAnnotation } from "./store.js";
 export function buildAgentPrompt(annotation: ServerAnnotation): string {
   const parts: string[] = [];
 
-  parts.push(`You are working on a specific UI feedback item for a Next.js application.`);
+  parts.push(`You are working on a specific UI feedback item for an Astro site (React islands).`);
   parts.push(``);
   parts.push(`## Feedback`);
   parts.push(`**Type:** ${annotation.intent || "feedback"}`);
@@ -42,7 +42,7 @@ export function buildAgentPrompt(annotation: ServerAnnotation): string {
   parts.push(`1. Read the source file and understand the current code.`);
   parts.push(`2. Implement the requested change. This is a ${annotation.intent || "fix"} request.`);
   parts.push(`3. Make minimal, focused changes. Do not refactor unrelated code.`);
-  parts.push(`4. This project uses Tailwind CSS v4 for styling and Next.js App Router.`);
+  parts.push(`4. This project uses Tailwind CSS v4 and Astro: pages and static sections are .astro files (src/pages, src/components/**/*.astro); interactive parts are React islands (.tsx). The source location above points at the exact .astro element when the element comes from a template.`);
   parts.push(`5. Do NOT commit, push, or run any git commands. Just edit the file and stop.`);
 
   if (annotation.thread && annotation.thread.length > 0) {

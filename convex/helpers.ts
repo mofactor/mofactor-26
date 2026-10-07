@@ -1,4 +1,4 @@
-import { QueryCtx, MutationCtx } from "./_generated/server";
+import type { QueryCtx, MutationCtx } from "./_generated/server";
 import { ConvexError } from "convex/values";
 
 export async function requireAuth(ctx: QueryCtx | MutationCtx, token: string) {

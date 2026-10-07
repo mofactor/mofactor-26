@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useAdminSession } from "@/hooks/useAdminSession";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/admin/navigation";
 import { Input } from "@/components/ui/Input";
 import {
   InputGroup,

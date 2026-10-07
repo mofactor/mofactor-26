@@ -4,7 +4,7 @@ import { useAdminSession } from "@/hooks/useAdminSession";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { InsetWrapper, InsetWrapperContent } from "@/components/ui/InsetWrapper";
-import Link from "next/link";
+import { Link } from "@/admin/navigation";
 import { Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import type { Id } from "../../../convex/_generated/dataModel";
 

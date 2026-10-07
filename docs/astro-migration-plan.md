@@ -16,7 +16,9 @@ Status: direction approved 2026-10-08 · Target: Astro 7.3.x (Vite 8, Rust compi
 | 3 Home | Done. Contact → Astro Action; Journal → server island |
 | 4 Case studies | Done. Converted with a codemod; layout parity verified |
 | 5 Blog, OG, sitemap | Done. Astro-native post renderer; posts render on the server; real 404s |
-| Next | Admin (6) → editor annotate mode → editor precise commits (7) |
+| 6 Admin | Done. One client-only React app at `/nexus/[...path]`; a wouter shim keeps Next's `useRouter`/`usePathname`/`useParams`/`Link` signatures |
+| Editor, basic mode | Done. `factorframe` integration (dev only, nothing in builds); patch API as dev middleware; annotations carry exact `.astro` file:line; commits to `.astro` are refused with a hint until phase 7 |
+| Next | Final checks → staging on tt6 → production switch (8); then precise `.astro` commits (7) |
 
 **What changed from the plan in practice:**
 - **Images stay in `public/`.** `import.meta.glob("/public/**")` feeds `astro:assets`, which optimizes them in place, so existing URLs keep working. A build hook (`src/integrations/prune-image-originals.ts`) deletes the original copies Vite would otherwise duplicate into `_astro/`.
@@ -24,6 +26,9 @@ Status: direction approved 2026-10-08 · Target: Astro 7.3.x (Vite 8, Rust compi
 - **Two packages had to be hoisted** for Astro 7's build: `cookie@2` and `sharp`.
 - **Build output must stay inside the project**, or the prerender step can't resolve `react`.
 - **Restart the dev server after generating files with scripts.** Otherwise Tailwind's dev plugin misses their classes. Production builds are unaffected.
+- **Astro's dev toolbar strips the source stamps.** Its audit app removes `data-astro-source-*` from the DOM after load. The editor records them first, from a `<head>` inline script.
+- **The admin preview stays on the React renderer.** Admin login lives in localStorage, so the server can't render drafts.
+- **Share links use the canonical URL.** Server-rendered islands must not branch on `window` for attributes, because React's hydration doesn't patch mismatched attributes.
 - **Blog renderer:** `TiptapContent.astro` renders posts as static HTML with islands only for media. The admin preview keeps the React renderer. Both use `render-helpers.ts`.
 - **`/og` renderer:** runs satori through its CommonJS build. `@vercel/og` and satori's ESM builds bundle harfbuzz with CommonJS globals, which fail under Astro. It uses Noto Sans, Next's OG font, so cards match pixel for pixel apart from antialiasing.
 - **Measured against production Next:**

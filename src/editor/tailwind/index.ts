@@ -2,7 +2,7 @@ import { TailwindClassIndex } from "./class-index";
 import { generateStaticClasses } from "./static-classes";
 
 /**
- * Fetches compiled Tailwind CSS from the Next.js dev server
+ * Reads the compiled Tailwind CSS from the dev server
  * and builds a searchable class index.
  * CSS-scanned classes get priority (they have cssText for preview).
  * Static class names fill in the rest for comprehensive autocomplete.

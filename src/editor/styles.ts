@@ -3,7 +3,7 @@
  * Scoped to [data-editor-root] and editor-specific classes.
  * No dependency on Tailwind or the site's styles.
  */
-import editorCSS from "./editor.raw.css";
+import editorCSS from "./editor.raw.css?raw";
 
 export function injectEditorStyles(): () => void {
   const style = document.createElement("style");

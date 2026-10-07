@@ -121,10 +121,10 @@ export function ShareBar({ title, slug }: { title: string; slug: string }) {
     };
   }, []);
 
-  const url =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/blog/${slug}`
-      : `/blog/${slug}`;
+  // Always the canonical URL: the bar is now server-rendered, so a window-based origin
+  // would differ between server and client (and React keeps the server's relative href).
+  // Shares from localhost or staging should point at the live post anyway.
+  const url = `https://monofactor.com/blog/${slug}`;
 
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);

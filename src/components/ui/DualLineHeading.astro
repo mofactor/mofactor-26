@@ -2,6 +2,7 @@
 // Static twin of DualLineHeading.tsx. Only the animated words (if any) run JS.
 import BlinkText from "./BlinkText.astro";
 import ThinkingText from "./ThinkingText.astro";
+import type { HTMLTag } from "astro/types";
 import type { BlinkTimingConfig } from "@/lib/fx/blink";
 
 interface BlinkProps {
@@ -13,7 +14,7 @@ interface BlinkProps {
 }
 
 interface Props {
-  as?: string;
+  as?: HTMLTag;
   topLine?: string;
   bottomLine?: string;
   blink?: boolean | BlinkProps;

@@ -4,6 +4,7 @@ import react from "@astrojs/react";
 import node from "@astrojs/node";
 import tailwindcss from "@tailwindcss/vite";
 import pruneImageOriginals from "./src/integrations/prune-image-originals.ts";
+import factorframe from "./src/integrations/factorframe.ts";
 
 export default defineConfig({
   site: "https://monofactor.com",
@@ -19,7 +20,8 @@ export default defineConfig({
 
   // Pages prerender by default; blog, actions, /og and /nexus opt into on-demand rendering
   adapter: node({ mode: "standalone" }),
-  integrations: [react(), pruneImageOriginals()],
+  // factorframe: the visual editor, dev only (adds nothing to builds)
+  integrations: [react(), factorframe(), pruneImageOriginals()],
   vite: {
     plugins: [tailwindcss()],
     // Pre-bundle island deps at startup. Discovering them mid-session makes Vite re-optimize

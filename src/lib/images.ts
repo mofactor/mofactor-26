@@ -30,7 +30,7 @@ export async function islandImage(
   publicPath: string,
   options: IslandImageOptions = {},
 ): Promise<IslandImage> {
-  const image = await getImage({ src: img(publicPath), ...options });
+  const image = await getImage({ src: img(publicPath), ...options } as Parameters<typeof getImage>[0]);
   return {
     src: image.src,
     srcSet: image.srcSet.attribute || undefined,

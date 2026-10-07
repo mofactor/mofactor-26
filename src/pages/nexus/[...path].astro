@@ -1,0 +1,12 @@
+---
+// /nexus/** → the admin SPA (src/admin/AdminApp.tsx). One on-demand shell for every
+// admin URL so deep links work; routing happens client-side.
+export const prerender = false;
+
+import Base from "@/layouts/Base.astro";
+import AdminApp from "@/admin/AdminApp";
+---
+
+<Base title="Admin" noindex thirdPartyScripts={false}>
+  <AdminApp client:only="react" />
+</Base>
