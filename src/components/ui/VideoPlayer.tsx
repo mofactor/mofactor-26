@@ -88,6 +88,12 @@ export function VideoPlayer({
     const v = videoRef.current;
     if (!v) return;
 
+    // The server-rendered <video autoplay> can start before this island hydrates,
+    // so its "play" event may already have fired: start from the element's state
+    setPlaying(!v.paused && !v.ended);
+    setMuted(v.muted);
+    if (v.readyState >= HTMLMediaElement.HAVE_METADATA) setDuration(v.duration);
+
     const onPlay = () => setPlaying(true);
     const onPause = () => setPlaying(false);
     const onTimeUpdate = () => {

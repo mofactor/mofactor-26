@@ -18,7 +18,9 @@ Status: direction approved 2026-10-08 · Target: Astro 7.3.x (Vite 8, Rust compi
 | 5 Blog, OG, sitemap | Done. Astro-native post renderer; posts render on the server; real 404s |
 | 6 Admin | Done. One client-only React app at `/nexus/[...path]`; a wouter shim keeps Next's `useRouter`/`usePathname`/`useParams`/`Link` signatures |
 | Editor, basic mode | Done. `factorframe` integration (dev only, nothing in builds); patch API as dev middleware; annotations carry exact `.astro` file:line; commits to `.astro` are refused with a hint until phase 7 |
-| Next | Final checks → staging on tt6 → production switch (8); then precise `.astro` commits (7) |
+| 8 Local QA | Done. Layout matches Next at 375/768/1440 px on all 10 pages; dark mode matches; head/SEO checked on 12 routes (only intended improvements differ); two bugs found and fixed (below) |
+| 8 Deploy files | Done and tested locally: `passenger.cjs`, `scripts/deploy.sh`, `public/.htaccess`. A production build served through `passenger.cjs` answers every route correctly |
+| Next | Staging on tt6 (server changes, needs your OK) → production switch (8); then precise `.astro` commits (7) |
 
 **What changed from the plan in practice:**
 - **Images stay in `public/`.** `import.meta.glob("/public/**")` feeds `astro:assets`, which optimizes them in place, so existing URLs keep working. A build hook (`src/integrations/prune-image-originals.ts`) deletes the original copies Vite would otherwise duplicate into `_astro/`.
@@ -31,9 +33,18 @@ Status: direction approved 2026-10-08 · Target: Astro 7.3.x (Vite 8, Rust compi
 - **Share links use the canonical URL.** Server-rendered islands must not branch on `window` for attributes, because React's hydration doesn't patch mismatched attributes.
 - **Blog renderer:** `TiptapContent.astro` renders posts as static HTML with islands only for media. The admin preview keeps the React renderer. Both use `render-helpers.ts`.
 - **`/og` renderer:** runs satori through its CommonJS build. `@vercel/og` and satori's ESM builds bundle harfbuzz with CommonJS globals, which fail under Astro. It uses Noto Sans, Next's OG font, so cards match pixel for pixel apart from antialiasing.
-- **Measured against production Next:**
-  - Home: 1,500 → 958 KB of JS.
-  - Flux: 776 → 448 KB.
+- **Images get `color: transparent`** (a base-layer rule in `globals.css`), as `next/image` set inline. It hides alt text while loading and keeps `currentColor` borders invisible: Flux's 11 `dark:border` images never showed a border on Next. For a visible border, give it a color (`dark:border-zinc-800`).
+- **`VideoPlayer` reads the video's state when it hydrates.** The server-rendered `<video autoplay>` starts before a `client:visible` island hydrates, so the `play` event is gone by then and the play overlay stayed over a playing video.
+- **Testing note:** while the browser is hidden or in a background tab, IntersectionObserver is throttled, so `client:visible` islands don't hydrate and lazy media doesn't load. That's a measurement artifact, not a bug.
+- **Measured against production Next** (JS loaded with the page, same origin; raw / compressed. Next's compressed size is what Cloudflare served; Astro's is a brotli estimate from the built files):
+
+  | Page | Next (live) | Astro | Download |
+  |---|---|---|---|
+  | Home | 1,429 / 418 KB | 914 / 252 KB | −40% |
+  | Case study (Flux) | 738 / 231 KB | 417 / 135 KB | −42% |
+  | Blog | 621 / 185 KB | 267 / 83 KB | −55% |
+  | Blog post | 728 / 219 KB | 276 / 87 KB, +8 KB per video player when scrolled into view | −60% |
+
   - Blog posts: about 2,000 words of article HTML for crawlers, where Next served 20 ("Loading…").
   - Postlight, Solitonic and Wadi Grocery no longer shift layout while images load. Next's authored width/height hints were wrong, by up to 1,638px on Postlight.
 
@@ -528,6 +539,15 @@ touch tmp/restart.txt
 
 If the build fails, the script exits before the swap and the current build keeps serving. Today's actions rebuild in place, so a failed build can leave things half-written.
 
+Tested locally: the build lands in `dist-next`, the swap keeps `dist-prev` for rollback, `.htaccess` ends up in `dist/client`, and `PORT=4331 node passenger.cjs` serves every route (prerendered pages, posts, 404s, `/og`, `/sitemap.xml`, `/nexus`, `/work/flux/` → 301 to `/work/flux`).
+
+**Known gap:** `npm ci` deletes and reinstalls `node_modules` (about a minute). The running server keeps what it has loaded, but an on-demand route that hasn't been loaded since the last restart can fail during that minute. Prerendered pages are unaffected, because Apache serves them.
+
+**Check on staging** (the local test can't cover Apache/nginx):
+- `curl -I` a `/_astro/…` file shows `Cache-Control: public, max-age=31536000, immutable`. If nginx serves static files itself, `.htaccess` is ignored: add the header in Plesk → Apache & nginx → additional nginx directives instead.
+- `/work` and `/works` (directories in `dist/client`) return 404, not 403 or a directory listing.
+- `/package.json`, `/src/…` and `/.env.local` return 404.
+
 ### Staging on tt6 (Phase 8, after local parity; Plesk changes, so confirm first)
 
 1. tt6 Git repo: switch the branch from `main` to `astro`, and set the post-deploy action to `bash scripts/deploy.sh`.
@@ -603,26 +623,28 @@ If the build fails, the script exits before the swap and the current build keeps
 
 ## 9. Parity checklist
 
+`[x]` = verified locally (2026-10-08). Everything else is checked on staging.
+
 **Routes and URLs**
-- [ ] Every route returns the same status code. An unknown blog slug now correctly returns 404.
-- [ ] URLs have no trailing slash, same as today.
+- [x] Every route returns the same status code. An unknown blog slug now correctly returns 404.
+- [x] URLs have no trailing slash, same as today. `/work/flux/` redirects with 301, where Next uses 308.
 
 **SEO**
-- [ ] Title, description and canonical match on every route.
-- [ ] `og:*` and `twitter:*` tags match, with absolute image URLs.
-- [ ] JSON-LD on `/` and on blog posts.
-- [ ] Favicon, SVG icon and apple-touch-icon links are present.
-- [ ] `sitemap.xml` includes posts; `robots.txt` matches.
-- [ ] `/og?title=…&subtitle=…` renders the same image.
+- [x] Title, description and canonical match on every route. Differences are additions: canonical everywhere, `og:*`/`twitter:*` site tags that Next dropped on subpages, `/blog`'s own card, server-rendered BlogPosting JSON-LD, and 404 titles.
+- [x] `og:*` and `twitter:*` tags match, with absolute image URLs.
+- [x] JSON-LD on `/` and on blog posts.
+- [x] Favicon, SVG icon and apple-touch-icon links are present. The touch icon moved from `/apple-icon.png` to `/apple-touch-icon.png` (same file).
+- [x] `sitemap.xml` includes posts; `robots.txt` matches.
+- [x] `/og?title=…&subtitle=…` renders the same image.
 
 **Security**
 - [ ] Source files return 404 on tt6 and production (`/package.json`, `/src/...`, `/node_modules/...`).
 
 **Look and behavior**
-- [ ] Light/dark screenshots at 375, 768 and 1440 px are within tolerance (hero canvas masked).
+- [x] Light/dark at 375, 768 and 1440 px is within tolerance. Measured as section heights at all three widths (within 1px; the home hero's +20px on Next is an uncommitted dev patch) and as every element's text, background and border colors in dark mode.
 - [ ] No theme flash on load, the toggle persists, and every island stays in sync.
-- [ ] BottomNav tracks sections and samples the nav theme over dark media.
-- [ ] Videos autoplay muted inline. Lightbox opens the right slide, and arrows, zoom and Escape work.
+- [x] BottomNav tracks sections and samples the nav theme over dark media. Same light/dark result at the same scroll positions.
+- [ ] Videos autoplay muted inline (verified). Lightbox opens the right slide, and arrows, zoom and Escape work.
 - [ ] Carousels autoplay and scroll with the wheel.
 
 **Integrations**
@@ -637,7 +659,7 @@ If the build fails, the script exits before the swap and the current build keeps
 - [ ] Edit → commit works on `.astro` and on `.tsx`.
 
 **Performance**
-- [ ] JS bytes and Lighthouse scores per route are at least as good as the baseline.
+- [ ] JS bytes and Lighthouse scores per route are at least as good as the baseline. JS bytes: 40–60% smaller (see Progress); Lighthouse runs on staging.
 
 ---
 

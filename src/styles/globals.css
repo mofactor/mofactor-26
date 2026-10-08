@@ -173,6 +173,14 @@ button {
   outline: none !important;
 }
 
+/* next/image put color: transparent on every image: it hides alt text while loading and
+   makes currentColor borders invisible (Flux's dark:border). Same look, overridable by utilities. */
+@layer base {
+  img {
+    color: transparent;
+  }
+}
+
 /* Section heading style */
 .section-heading-muted {
   color: #bbb;
