@@ -19,7 +19,8 @@ Status: direction approved 2026-10-08 · Target: Astro 7.3.x (Vite 8, Rust compi
 | 6 Admin | Done. One client-only React app at `/nexus/[...path]`; a wouter shim keeps Next's `useRouter`/`usePathname`/`useParams`/`Link` signatures |
 | Editor, basic mode | Done. `factorframe` integration (dev only, nothing in builds); patch API as dev middleware; annotations carry exact `.astro` file:line; commits to `.astro` are refused with a hint until phase 7 |
 | 8 Local QA | Done. Layout matches Next at 375/768/1440 px on all 10 pages; dark mode matches; head/SEO checked on 12 routes (only intended improvements differ); two bugs found and fixed (below) |
-| 8 Deploy files | Done and tested locally: `passenger.cjs`, `scripts/deploy.sh`, `public/.htaccess`. A production build served through `passenger.cjs` answers every route correctly |
+| 8 Deploy files | Done and tested locally: `passenger.cjs`, `scripts/deploy.sh`. A production build served through `passenger.cjs` answers every route correctly |
+| Security fix | Done on production (2026-10-08): document root `httpdocs/public`, so source files return 404 |
 | Next | Staging on tt6 (server changes, needs your OK) → production switch (8); then precise `.astro` commits (7) |
 
 **What changed from the plan in practice:**
@@ -259,7 +260,7 @@ Each phase ends in a runnable state. Estimates are focused days.
 - Passenger loads startup files with `require()`, and its `listen()` hook catches the Astro server's call.
 - This and `scripts/deploy.sh` (§6) are written now but only exercised at the staging step in Phase 8.
 - `astro.config` reads `outDir` from `ASTRO_OUT_DIR`, so the script can build beside the live `dist/` and then swap.
-- Add `public/.htaccess` for immutable `/_astro/*` caching.
+- ~~Add `public/.htaccess` for immutable `/_astro/*` caching.~~ Not needed: the Node server serves `/_astro/*` and sets that header itself (§6).
 
 **Editor (minimal)**
 - Mount the editor from the integration in dev (`?raw` CSS import).
@@ -502,7 +503,11 @@ Phases 3–6 can run in any order after Phase 2. Phase 7 can trail the cutover.
 
 **`tt6.monofactor.com`**
 - A second Passenger app in the same subscription, with its own document root and repo (`mofactor-26.git`).
-- It also auto-deploys `main`, but its files date from early April.
+- Its repo's deployment path was `/httpdocs`, production's folder, so it deployed `main` into production rather than into tt6. tt6's own folder was a stale copy from early April.
+
+**Deploys are manual.** The GitHub repo has no webhooks, so a push deploys nothing. Deploy with `plesk ext git --fetch` and then `--deploy` (both with `-domain … -name …`), or Plesk → Git → Pull/Deploy.
+
+**Plesk's Node.js app root is derived, not stored.** `dom_param` holds only `ext-nodejs-startupFile`, `-handlerPath`, `-enabled` and `-environment`. The app root is the document root, minus a trailing `/public`. So the document root must be `<app root>/public`: `httpdocs/dist/client` would move the app root into `dist/client`.
 
 **Convex**
 - Self-hosted in Docker on the same box: `convex-monofactor-backend-1` on 127.0.0.1:3230/3231, public as `monovex.monofactor.com`.
@@ -517,56 +522,44 @@ Same server, same Plesk/Passenger/Git setup, and no new services.
 | Setting | Next today | Astro |
 |---|---|---|
 | Startup file | `.next/standalone/server.js` | `passenger.cjs`: loads `.env.local`, then imports `dist/server/entry.mjs` |
-| Document root | `httpdocs`, the app root. This is why the source tree is public (§10) | `httpdocs/dist/client`. Apache serves built files directly, and everything else goes to Passenger |
-| Node | 22.23.3 | 22.23.3 works (Astro needs ≥ 22.12). Plesk's 24.21.0 LTS is the better choice |
+| Document root | `httpdocs` until 2026-10-08, which exposed the source tree (§10); now `httpdocs/public` | `httpdocs/public`, unchanged. Apache serves the plain `public/` files; everything else goes to Passenger |
+| Node | 22.23.3 | 22.23.3, the same binary the deploy shell uses (`/usr/bin/node`). Astro needs ≥ 22.12 |
 | Post-deploy actions | npm ci, build, 3 copies, restart | `bash scripts/deploy.sh` (below) |
-| Env | `NEXT_PUBLIC_*` | Add `PUBLIC_CONVEX_URL`, plus an optional server-only `CONVEX_URL=http://127.0.0.1:3230`. Keep the old names until Next is gone |
-| Static assets | Served by Next | Apache serves `dist/client`. A `public/.htaccess` adds immutable caching for `/_astro/*`, and Cloudflare caches at the edge |
+| Env | `NEXT_PUBLIC_*` | Add `PUBLIC_CONVEX_URL`. Keep the old names until Next is gone |
+| Static assets | Served by Next | Apache serves `public/`. The Node server serves `dist/client` (prerendered pages, `/_astro/*` with `immutable` caching); Cloudflare caches assets at the edge |
 | Image cache | n/a | `cacheDir: ./.astro-cache`, which survives `npm ci` |
 
-**`scripts/deploy.sh`** (committed, so it's versioned and fail-safe):
+**`scripts/deploy.sh`** (committed, so it's versioned): `npm ci`, build into `dist-next`, swap it in as `dist` (keeping `dist-prev`), then `touch tmp/restart.txt`. If the build fails, the script exits before the swap and the current build keeps serving. Today's actions rebuild in place, so a failed build can leave things half-written.
 
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-npm ci
-ASTRO_OUT_DIR=dist-next npm run build      # astro.config reads outDir from ASTRO_OUT_DIR
-rm -rf dist-prev
-[ -d dist ] && mv dist dist-prev
-mv dist-next dist                          # near-atomic swap: the live build is never half-written
-touch tmp/restart.txt
-```
+Tested locally: the build lands in `dist-next`, the swap keeps `dist-prev` for rollback, and `PORT=4331 node passenger.cjs` serves every route (prerendered pages, posts, 404s, `/og`, `/sitemap.xml`, `/nexus`, `/work/flux/` → 301 to `/work/flux`).
 
-If the build fails, the script exits before the swap and the current build keeps serving. Today's actions rebuild in place, so a failed build can leave things half-written.
+**Known gap:** `npm ci` deletes and reinstalls `node_modules` (about a minute). The running server keeps what it has loaded, but an on-demand route that hasn't been loaded since the last restart can fail during that minute.
 
-Tested locally: the build lands in `dist-next`, the swap keeps `dist-prev` for rollback, `.htaccess` ends up in `dist/client`, and `PORT=4331 node passenger.cjs` serves every route (prerendered pages, posts, 404s, `/og`, `/sitemap.xml`, `/nexus`, `/work/flux/` → 301 to `/work/flux`).
+**Check on staging:**
+- `curl -I` a `/_astro/…` file shows `Cache-Control: public, max-age=31536000, immutable`.
+- `/work` and `/works` return 404, not 403 or a directory listing.
+- `/package.json`, `/src/…` and `/.env.local` don't return 200.
 
-**Known gap:** `npm ci` deletes and reinstalls `node_modules` (about a minute). The running server keeps what it has loaded, but an on-demand route that hasn't been loaded since the last restart can fail during that minute. Prerendered pages are unaffected, because Apache serves them.
+### Staging on tt6
 
-**Check on staging** (the local test can't cover Apache/nginx):
-- `curl -I` a `/_astro/…` file shows `Cache-Control: public, max-age=31536000, immutable`. If nginx serves static files itself, `.htaccess` is ignored: add the header in Plesk → Apache & nginx → additional nginx directives instead.
-- `/work` and `/works` (directories in `dist/client`) return 404, not 403 or a directory listing.
-- `/package.json`, `/src/…` and `/.env.local` return 404.
-
-### Staging on tt6 (Phase 8, after local parity; Plesk changes, so confirm first)
-
-1. tt6 Git repo: switch the branch from `main` to `astro`, and set the post-deploy action to `bash scripts/deploy.sh`.
-2. tt6 Node.js settings: startup file `passenger.cjs`, document root `tt6.monofactor.com/dist/client`, Node 24.
-3. tt6 `.env.local`: add `PUBLIC_CONVEX_URL` and `CONVEX_URL`.
-4. Push `astro`, read the deploy log, smoke-test, then run the parity suite: tt6 (Astro) vs monofactor.com (Next).
+1. Move tt6's stale folder aside, recreate it, and copy `.env.local` back with `PUBLIC_CONVEX_URL` added.
+2. tt6 Git repo: deployment path `/tt6.monofactor.com`, branch `astro`, post-deploy action `bash scripts/deploy.sh`.
+3. Push `astro`, then fetch and deploy.
+4. tt6 document root `tt6.monofactor.com/public`; startup file `passenger.cjs`.
+5. Smoke-test, then compare tt6 (Astro) with monofactor.com (Next).
 
 ### Production cutover runbook
 
 **Pre-flight**
-- The document root is already off the app root (§10, item 0). Otherwise the merge in step 2 briefly serves the new tree publicly, including this plan's server details.
-- tt6 passes the parity suite.
-- `monofactor.com/.env.local` has the new `PUBLIC_*` vars. These are additive and harmless to Next.
+- The document root is `httpdocs/public` (done 2026-10-08).
+- tt6 passes the checks.
+- `monofactor.com/.env.local` has `PUBLIC_CONVEX_URL`. It's additive and harmless to Next.
 - Content freeze is in effect.
 
 **Steps**
-1. **Plesk → monofactor.com → Git:** set the post-deploy action to `bash scripts/deploy.sh`. Next keeps serving, because it runs from `.next/standalone`, which carries its own `node_modules`.
-2. **Merge `astro` into `main` and push.** Plesk deploys: `npm ci` plus the Astro build into `dist/`. The restart is harmless, because the startup file still points at Next.
-3. **Plesk → Node.js:** set the startup file to `passenger.cjs`, the document root to `httpdocs/dist/client`, and Node to 24. Then restart the app. Astro is now live.
+1. **Git (`mofaletta-26.git`):** set the post-deploy action to `bash scripts/deploy.sh`. Next keeps serving, because it runs from `.next/standalone`, which carries its own `node_modules`.
+2. **Fast-forward `main` to `astro`, push, then fetch and deploy.** The deploy runs `npm ci` plus the Astro build into `dist/`. The restart is harmless, because the startup file still points at Next.
+3. **Startup file → `passenger.cjs`** (Plesk → Node.js → Application Startup File; it's `ext-nodejs-startupFile` in `dom_param`, then `plesk sbin httpdmng --reconfigure-domain monofactor.com`). Astro is now live.
 4. **Smoke test:**
    - every route returns 200, and an unknown blog slug returns 404
    - contact form
@@ -576,7 +569,7 @@ Tested locally: the build lands in `dist-next`, the swap keeps `dist-prev` for r
    - theme toggle, videos
 
 **Rollback**
-- Set the startup file back to `.next/standalone/server.js` and the document root to `httpdocs/public`, then restart.
+- Set the startup file back to `.next/standalone/server.js` and reconfigure the domain. The document root stays `httpdocs/public`.
 - This works as long as `.next/` stays on disk. Keep it for a week, then delete it along with the Next dependencies.
 
 ---
@@ -669,7 +662,7 @@ Tested locally: the build lands in `dist-next`, the swap keeps `dist-prev` for r
    - Examples that return 200: `/package.json`, `/src/app/actions/contact.ts`, `/convex/auth.ts`, `/README.md`, `/.claude/annotation-history.json`, `/.mcp.json`, `/node_modules/**` and `/.next/**`.
    - Cause: Plesk's document root is the app root (`httpdocs`), and Apache serves any file that exists there.
    - No secrets leak: every `.env*` path, including the copy in `.next/standalone/`, returns 403.
-   - **Fix now:** in Plesk → Node.js, set the document root to `httpdocs/public` (and `tt6.monofactor.com/public` for tt6).
+   - **Fixed on production 2026-10-08:** document root `httpdocs/public`. Every path above now returns 404 (`.env.local` 403). tt6 gets the same fix when it's staged.
 1. **Contact email injects user input as HTML.** `${name}`, `${subject}` and `${message}` go into the email's `htmlContent` unescaped. Escape them, either in the new Action or in Next now.
 2. **Blog is client-rendered.** Content is invisible without JS, and missing slugs return 200.
 3. **The homepage opens a Convex websocket** just to show three post titles.
