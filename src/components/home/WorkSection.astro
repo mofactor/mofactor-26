@@ -20,7 +20,9 @@ const videoType = (src?: string) => (src?.endsWith(".webm") ? "video/webm" : "vi
     {/* Featured: bg matches the film's own background, so the letterbox on phones is seamless */}
     <article data-nav-theme="dark" class="relative dark:mix-blend-none overflow-hidden rounded-2xl overflow-hidden sm:col-span-2 md:aspect-[16/9] bg-zinc-950">
 
-      {/* Video: fills the card on desktop; on phones the whole 16:9 film sits between the title and the copy */}
+      {/* Video: fills the card on desktop; on phones the whole 16:9 film sits between the title and the copy,
+          its top and bottom edges (21.875% / 78.125% of the square) feathered into the card, since browsers
+          render the film's near-black a few levels apart */}
       <div class="relative z-10 max-md:aspect-[1/1] md:absolute md:inset-0">
         <div class="h-full w-full">
           {featured.videoSrc && (
@@ -30,7 +32,7 @@ const videoType = (src?: string) => (src?.endsWith(".webm") ? "video/webm" : "vi
               muted
               playsinline
               poster={featured.videoPoster}
-              class="h-full w-full object-cover max-md:object-contain"
+              class="h-full w-full object-cover max-md:object-contain max-md:[mask-image:linear-gradient(to_bottom,transparent_21.875%,black_26%,black_74%,transparent_78.125%)]"
             >
               <source src={featured.videoSrc} type={videoType(featured.videoSrc)} />
             </video>
