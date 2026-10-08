@@ -9,6 +9,8 @@ export interface WorkItem {
   hoverSrc?: string;
   darkHover?: boolean;
   logoClassName?: string;
+  /** Kept here but left out of the home grid and prev/next links */
+  hidden?: boolean;
 }
 
 export const works: WorkItem[] = [
@@ -64,6 +66,7 @@ export const works: WorkItem[] = [
     logoClassName: "w-[40%]",
     hoverSrc: "/assets/work/hastam/grid-hastam.webp",
     darkHover: true,
+    hidden: true,
   },
   {
     title: "Kollektor",
@@ -111,3 +114,5 @@ export const works: WorkItem[] = [
     hoverSrc: "/assets/work/wadi-grocery/grid-wadigrocery.webp",
   },
 ];
+
+export const visibleWorks = works.filter((w) => !w.hidden);

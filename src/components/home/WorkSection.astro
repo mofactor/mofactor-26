@@ -3,7 +3,7 @@
 // the nav-theme hint below and the lazy video (LazyVideo.astro).
 import DualLineHeading from "@/components/ui/DualLineHeading.astro";
 import LazyVideo from "@/components/ui/LazyVideo.astro";
-import { works } from "@/data/works";
+import { visibleWorks as works } from "@/data/works";
 
 const [featured, ...items] = works;
 const videoType = (src?: string) => (src?.endsWith(".webm") ? "video/webm" : "video/mp4");
