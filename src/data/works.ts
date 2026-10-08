@@ -33,7 +33,7 @@ export const works: WorkItem[] = [
     href: "/work/nickai",
     logoSrc: "/assets/logos/nickai.svg",
     logoClassName: "w-[40%]",
-    hoverSrc: "/assets/work/nickai/grid-nickai.webp",
+    hoverSrc: "/assets/work/nickai/grid-nick.jpg",
     darkHover: true,
   },
   {
