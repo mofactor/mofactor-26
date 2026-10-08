@@ -41,7 +41,7 @@ const videoType = (src?: string) => (src?.endsWith(".webm") ? "video/webm" : "vi
       </div>
 
       {/* Shade under the copy so it stays readable over the film (desktop only: on phones the copy sits below it) */}
-      <div class="pointer-events-none absolute inset-0 z-[15] hidden bg-gradient-to-t from-black/70 via-transparent to-transparent md:block" />
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 z-[15] hidden h-[14%] bg-gradient-to-t from-black/70 to-transparent md:block" />
 
       {/* Text overlay */}
       <div class="z-20 max-md:border-t max-md:border-white/5 max-md:px-6 max-md:py-6 absolute inset-0 flex flex-col justify-between p-6 dark:max-md:border-white/5">

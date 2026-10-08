@@ -15,27 +15,25 @@ export interface WorkItem {
 
 export const works: WorkItem[] = [
   {
-    title: "NickAI",
-    description:
-      "Product design for an agentic trading platform, from the design system and chat widgets to the marketing site.",
-    href: "/work/nickai",
-    featured: true,
-    videoSrc: "/works/nickai/nickai-film.webm",
-    videoPoster: "/works/nickai/nickai-film-poster.jpg",
-    logoSrc: "/assets/logos/nickai.svg",
-    logoClassName: "w-[40%]",
-    hoverSrc: "/assets/work/nickai/grid-nickai.webp",
-    darkHover: true,
-  },
-  {
     title: "Fountible",
     description:
       "Designing and building a design tool whose canvas is real React and Tailwind, so the design is the code.",
     href: "/work/fountible",
+    featured: true,
+    videoSrc: "/works/fountible/fountible-feature.webm",
+    videoPoster: "/works/fountible/fountible-feature-poster.jpg",
     logoSrc: "/assets/logos/fountible.svg",
     logoClassName: "w-[16%]",
-    videoSrc: "/works/fountible/fountible-hover.webm",
-    videoPoster: "/works/fountible/fountible-hover-poster.webp",
+    darkHover: true,
+  },
+  {
+    title: "NickAI",
+    description:
+      "Product design for an agentic trading platform, from the design system and chat widgets to the marketing site.",
+    href: "/work/nickai",
+    logoSrc: "/assets/logos/nickai.svg",
+    logoClassName: "w-[40%]",
+    hoverSrc: "/assets/work/nickai/grid-nickai.webp",
     darkHover: true,
   },
   {
