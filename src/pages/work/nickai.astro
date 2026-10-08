@@ -33,7 +33,7 @@ const seo = {
     { label: "Intro", href: "#root" },
     { label: "Overview", href: "#overview" },
     { label: "Prototypes", href: "#prototypes" },
-    { label: "Widgets", href: "#widgets" },
+    { label: "Portfolio", href: "#portfolio" },
     { label: "Films", href: "#films" },
     { label: "Outcome", href: "#outcome" },
   ]} />
@@ -94,7 +94,7 @@ const seo = {
                 NickAI is an agentic trading platform. You describe what you want to trade in plain English, and Nick, a non-custodial AI agent, turns it into a workflow that it builds, tests and runs across crypto, stocks and prediction markets.
               </p>
               <p>
-                As NickAI's designer in 2026, I worked across its surfaces: the product's design language and chat widgets, the prototypes that became the spec, the getnick.ai website, and a small content engine for launch visuals.
+                As NickAI's designer in 2026, I worked across its surfaces: the product's design language, chat widgets and portfolio pages, the prototypes that became the spec, the getnick.ai website, and a small content engine for launch visuals.
               </p>
             </IntroTextWrapper>
           </SectionHeaderWrapper>
@@ -113,46 +113,51 @@ const seo = {
 
             <IntroTextWrapper>
               <p>
-                Instead of handing over static mockups, I built working prototypes in code: chat beside a live workflow, its structure, scheduled runs and execution history, all in one frame. Engineering then ported the prototype's design system straight into the product, with its tokens, components, typography, icon set and floating-panel app frame.
+                Instead of handing over static mockups, I built working prototypes in code. Engineering then ported the prototype's design system straight into the product, with its tokens, components, typography, icon set and floating-panel app frame.
+              </p>
+              <p>
+                The sign-in screen shows the approach in miniature. I built its showcase directly in the product: a four-node workflow, drawn like the builder's own node cards, that runs in a loop and reports back on Telegram.
               </p>
             </IntroTextWrapper>
           </SectionHeaderWrapper>
 
           <div data-nav-theme="dark" class="mt-24">
-            <Lightbox client:idle images={[{ src: "/works/nickai/nickai-workflow.jpg", alt: "Prototype of a multi-LLM consensus workflow beside the chat with Nick" }]}>
-              <Image src={img("/works/nickai/nickai-workflow.jpg")} alt="Prototype of a multi-LLM consensus workflow beside the chat with Nick" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
-            </Lightbox>
+            <LazyVideo src="/works/nickai/nickai-signin.webm" posterSrc="/works/nickai/nickai-signin-poster.jpg" autoplay loop muted playsinline class="w-full h-auto rounded-2xl" />
           </div>
         </div>
       </section>
 
-      {/* Widgets */}
-      <section id="widgets" aria-labelledby="widgets-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
+      {/* Portfolio */}
+      <section id="portfolio" aria-labelledby="portfolio-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
         <div class="container">
           <SectionHeaderWrapper>
             <DualLineHeading
               className="md:min-w-[360px]"
               blink
-              topLine="Widgets."
-              bottomLine="Ask a question, get a chart back." />
+              topLine="Portfolio."
+              bottomLine="One book, read two ways." />
 
             <IntroTextWrapper>
               <p>
-                Nick answers with widgets: prices, comparisons, market sentiment, prediction markets and order receipts. They are frozen snapshots of what the agent actually fetched, with the source and the time it was read, rather than UI generated on the fly. Asking again adds a fresh answer instead of quietly changing the old one.
+                The portfolio pages read the same book two ways. Simple answers what most people ask, in plain sentences: what the portfolio is worth, how it did against just holding Bitcoin, where the money is and how bumpy the ride has been.
               </p>
               <p>
-                Small details make them read at a glance: a tray holding an inner card, tabular numerals and a split-gradient Fear & Greed meter. Every trade goes through a single approval card.
+                Detailed is for traders: equity and drawdown on one axis, risk-adjusted returns, every workflow with its own sparkline, and a heatmap of how the workflows move together. All figures here are sample data.
               </p>
             </IntroTextWrapper>
           </SectionHeaderWrapper>
 
           <div data-nav-theme="dark" class="mt-24 flex flex-col gap-6">
             <Lightbox client:idle images={[
-              { src: "/works/nickai/nickai-widgets.jpg", alt: "A gallery of NickAI chat widgets" },
-              { src: "/works/nickai/nickai-chat-widget.jpg", alt: "A price widget inside a chat with Nick" },
+              { src: "/works/nickai/nickai-portfolio-simple.jpg", alt: "The Simple portfolio view: total value, returns against holding Bitcoin, allocation and a volatility gauge, with sample data" },
+              { src: "/works/nickai/nickai-portfolio-simple-2.jpg", alt: "Workflows with sparklines, where the profit came from, trades and monthly results, with sample data" },
+              { src: "/works/nickai/nickai-portfolio-detailed.jpg", alt: "The Detailed portfolio view: returns by period and the equity and underwater chart, with sample data" },
+              { src: "/works/nickai/nickai-portfolio-detailed-2.jpg", alt: "Constituents, trading stats, risk, PnL contribution and a correlation heatmap, with sample data" },
             ]}>
-              <Image src={img("/works/nickai/nickai-widgets.jpg")} alt="A gallery of NickAI chat widgets" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
-              <Image src={img("/works/nickai/nickai-chat-widget.jpg")} alt="A price widget inside a chat with Nick" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
+              <Image src={img("/works/nickai/nickai-portfolio-simple.jpg")} alt="The Simple portfolio view: total value, returns against holding Bitcoin, allocation and a volatility gauge, with sample data" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
+              <Image src={img("/works/nickai/nickai-portfolio-simple-2.jpg")} alt="Workflows with sparklines, where the profit came from, trades and monthly results, with sample data" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
+              <Image src={img("/works/nickai/nickai-portfolio-detailed.jpg")} alt="The Detailed portfolio view: returns by period and the equity and underwater chart, with sample data" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
+              <Image src={img("/works/nickai/nickai-portfolio-detailed-2.jpg")} alt="Constituents, trading stats, risk, PnL contribution and a correlation heatmap, with sample data" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
             </Lightbox>
           </div>
         </div>
