@@ -56,6 +56,7 @@ export const works: WorkItem[] = [
     logoClassName: "w-[40%]",
     hoverSrc: "/assets/work/gbo-vision/grid-gbo.webp",
     darkHover: true,
+    hidden: true,
   },
   {
     title: "Hastam",
@@ -77,6 +78,7 @@ export const works: WorkItem[] = [
     logoClassName: "w-[16%]",
     hoverSrc: "/assets/work/kollektor/grid-kollektor.webp",
     darkHover: true,
+    hidden: true,
   },
   {
     title: "Airbit",
