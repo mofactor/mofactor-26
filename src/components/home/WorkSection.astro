@@ -47,6 +47,11 @@ const videoType = (src?: string) => (src?.endsWith(".webm") ? "video/webm" : "vi
         </div>
       </div>
 
+      {/* Phones crop a still to a square under the text: shade it so the copy stays readable */}
+      {!featured.videoSrc && featured.imageSrc && (
+        <div class="pointer-events-none absolute inset-0 z-[15] md:hidden bg-gradient-to-t from-black/90 via-black/25 to-black/50" />
+      )}
+
       {/* Text overlay */}
       <div class="z-20 max-md:border-t max-md:border-white/5 max-md:px-6 max-md:py-6 absolute inset-0 flex flex-col justify-between p-6 dark:max-md:border-white/5">
         <h3 class="text-[20px] max-md:mb-2 text-white">
