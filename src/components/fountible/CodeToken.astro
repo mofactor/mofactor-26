@@ -1,0 +1,19 @@
+---
+/** Inline code chip in body copy. tone="bro" for Bro's own words. */
+interface Props {
+  tone?: "neutral" | "bro";
+  class?: string;
+}
+
+const { tone = "neutral", class: className = "" } = Astro.props;
+---
+
+<code
+  class:list={[
+    "rounded-[4px] px-1.5 py-0.5 font-mono text-[0.92em]",
+    tone === "bro"
+      ? "bg-primary-alpha-10 text-text-accent"
+      : "bg-[color-mix(in_oklab,var(--text-strong-950)_6%,transparent)] text-text-strong-950",
+    className,
+  ]}
+><slot /></code>

@@ -11,6 +11,7 @@ import IntroTextWrapper from "@/components/ui/IntroTextWrapper.astro";
 import ProjectMeta from "@/components/ui/ProjectMeta.astro";
 import WorkNavigation from "@/components/WorkNavigation.astro";
 import LazyVideo from "@/components/ui/LazyVideo.astro";
+import ExportShowcase from "@/components/fountible/ExportShowcase.astro";
 import { Image } from "astro:assets";
 import { img } from "@/lib/images";
 
@@ -98,8 +99,9 @@ const seo = {
             </IntroTextWrapper>
           </SectionHeaderWrapper>
 
-          <div class="mt-20">
-            <Image src={img("/works/fountible/fountible-site.jpg")} alt="The fountible.com homepage" width={1800} class="w-full h-auto rounded-2xl border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+          {/* The fountible.com hero in dark mode at 1440px (2x, 60fps): page load and intro, a hold on the finished hero, then a fade back to the blank page so it loops */}
+          <div data-nav-theme="dark" class="mt-20 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800">
+            <LazyVideo src="/works/fountible/fountible-site-intro-60.webm" posterSrc="/works/fountible/fountible-site-intro-60-poster.webp" autoplay loop muted playsinline class="w-full h-auto" />
           </div>
         </div>
       </section>
@@ -147,8 +149,9 @@ const seo = {
             </IntroTextWrapper>
           </SectionHeaderWrapper>
 
+          {/* fountible.com's export section as live markup, not a screenshot */}
           <div class="mt-24">
-            <Image src={img("/works/fountible/fountible-export.jpg")} alt="Exporting a selected frame as React and Tailwind JSX" width={1800} class="w-full h-auto rounded-2xl border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+            <ExportShowcase />
           </div>
         </div>
       </section>

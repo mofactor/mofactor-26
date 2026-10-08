@@ -1,0 +1,33 @@
+---
+/**
+ * Card tiers. Outlined = site facts, numerals, spec rows (hairline, no fill).
+ * Filled = light mocks, tag rows, changelog entries (card fill + micro shadow).
+ * Ported from fountible-site (src/components/system/Card.astro) without the selection frame.
+ */
+
+interface Props {
+  tier?: "outlined" | "filled";
+  href?: string;
+  id?: string;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { tier = "outlined", href, id, class: className = "", ...rest } = Astro.props;
+
+const tiers = {
+  outlined: "border border-line-card",
+  filled: "bg-bg-card shadow-micro",
+}[tier];
+
+const Tag = href ? "a" : "div";
+---
+
+<Tag
+  href={href}
+  id={id}
+  class:list={["group relative block rounded-card outline-none", tiers, className]}
+  {...rest}
+>
+  <slot />
+</Tag>

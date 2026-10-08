@@ -1,0 +1,36 @@
+---
+/**
+ * Bezel = rim + tray (inspo 2/3). Solid rim on the canvas, hairline rim on a
+ * sheet. Radii stay concentric: rim r32, 8px gap, tray r24. Without a tray,
+ * the rim is r24 around an r16 card. Below 640 the rim drops away.
+ */
+import Tray from "./Tray.astro";
+
+interface Props {
+  rim?: "solid" | "hairline" | "none";
+  tray?: boolean;
+  pad?: "sm" | "md" | "none";
+  dotted?: boolean;
+  class?: string;
+  trayClass?: string;
+}
+
+const { rim = "solid", tray = true, pad = "sm", dotted = false, class: className = "", trayClass = "" } = Astro.props;
+
+const rims = {
+  solid: "sm:bg-bg-rim sm:p-2 sm:shadow-rim",
+  hairline: "sm:p-2 sm:ring-1 sm:ring-overlay-line",
+  none: "",
+}[rim];
+const radius = rim === "none" ? "" : tray ? "sm:rounded-sheet" : "sm:rounded-tray";
+---
+
+<div class:list={["relative", radius, rims, className]}>
+  {tray ? (
+    <Tray pad={pad} dotted={dotted} class={trayClass}>
+      <slot />
+    </Tray>
+  ) : (
+    <slot />
+  )}
+</div>

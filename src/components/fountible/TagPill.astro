@@ -1,0 +1,22 @@
+---
+/** Tag pill. Raised on sheets and canvas; outline when it sits on a tray. */
+interface Props {
+  label: string;
+  variant?: "raised" | "outline";
+  mono?: boolean;
+  class?: string;
+}
+
+const { label, variant = "raised", mono = false, class: className = "" } = Astro.props;
+---
+
+<span
+  class:list={[
+    "inline-flex h-7 w-fit items-center whitespace-nowrap rounded-full px-3",
+    mono ? "font-mono text-[12px]" : "text-[13px] font-medium",
+    variant === "raised" ? "bg-bg-card text-text-strong-950 shadow-micro" : "border border-line-card text-text-sub-600",
+    className,
+  ]}
+>
+  {label}
+</span>

@@ -1,0 +1,21 @@
+---
+/**
+ * Authentic app chrome (zinc-900, never flips). One per composition, always in
+ * a Tray. The surface + lift shadow resolve in the PAGE theme (light lifts the
+ * card off a grey dip; dark lowers the floor), while the content is scoped
+ * `.dark` so site tokens inside it resolve to dark values on a light page.
+ * Uses the app's own system font stack, never the site fonts.
+ */
+interface Props {
+  class?: string;
+  innerClass?: string;
+}
+
+const { class: className = "", innerClass = "" } = Astro.props;
+---
+
+<div class:list={["relative overflow-hidden rounded-card bg-bg-chrome shadow-lift", className]}>
+  <div class:list={["dark relative font-chrome text-zinc-50 antialiased", innerClass]}>
+    <slot />
+  </div>
+</div>

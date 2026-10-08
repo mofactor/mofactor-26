@@ -1,0 +1,95 @@
+---
+/**
+ * The app's "Export as code" dialog, rebuilt from
+ *   APP/packages/editor/src/exporters/ExportDialog.tsx   (frame, copy, labels)
+ *   APP/packages/editor/src/exporters/HighlightedCode.tsx (vsDark, plain #e4e4e7)
+ *   APP/packages/editor/src/chrome/button.tsx            (primary ChromeButton)
+ * The code is real exporter output (scripts/export-sample.mjs → exportSample.ts),
+ * and "Copy code" really copies it. Lives inside a ProductCard.
+ * Ported from fountible-site (src/components/mocks/ExportCard.astro). The raw <button> is
+ * deliberate: it's a copy of Fountible's own button, not this site's Button component.
+ */
+import { exportSample } from "./exportSample";
+
+interface Props {
+  /** Clip the preview to this many lines (the dialog itself scrolls at 360px). */
+  maxLines?: number;
+  class?: string;
+}
+
+const { maxLines, class: className = "" } = Astro.props;
+const lines = maxLines ? exportSample.lines.slice(0, maxLines) : exportSample.lines;
+---
+
+<div class:list={["p-4 text-xs", className]} data-export-card>
+  <div class="flex items-start justify-between gap-3">
+    <div class="min-w-0">
+      <p class="text-sm font-semibold text-zinc-50">Export as code</p>
+      <p class="mt-1 text-xs text-zinc-400">React + Tailwind JSX for {exportSample.scope}.</p>
+    </div>
+    <span aria-hidden="true" class="flex size-7 shrink-0 items-center justify-center rounded-md text-zinc-400">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path></svg>
+    </span>
+  </div>
+  <div class="mt-3 max-h-[360px] overflow-auto rounded-md border border-white/10 bg-zinc-950 p-3 text-[11px] leading-relaxed">
+    <pre class="m-0 whitespace-pre font-chrome-mono" style="color:#e4e4e7"><code>{lines.map((line) => (
+      <span class="block">{line.length === 0 ? "\n" : line.map(([text, color]) => (
+        <span style={`color:${color}`}>{text}</span>
+      ))}</span>
+    ))}</code></pre>
+  </div>
+  <div class="mt-3 flex items-center justify-end gap-2">
+    <span class="sr-only" aria-live="polite" data-export-status></span>
+    <button
+      type="button"
+      class="inline-flex h-8 cursor-pointer select-none items-center justify-center gap-1.5 rounded-md border border-transparent bg-[#f05023] px-3 text-xs font-medium whitespace-nowrap text-white outline-none transition-colors hover:bg-[#f86238] focus-visible:ring-2 focus-visible:ring-white/40"
+      data-export-copy
+    >
+      <svg data-icon="copy" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"></rect>
+        <path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+      <svg data-icon="check" class="hidden" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+      <span data-label>Copy code</span>
+    </button>
+  </div>
+  <textarea class="hidden" aria-hidden="true" tabindex="-1" data-export-code>{exportSample.code}</textarea>
+</div>
+
+<style>
+  /* Copying needs JS; without it the button would be a dead control. Keep its
+     space so the card holds the dialog's proportions, and the code stays
+     selectable. */
+  :global(html:not(.js)) [data-export-copy] {
+    visibility: hidden;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-export-card]").forEach((card) => {
+    const button = card.querySelector<HTMLButtonElement>("[data-export-copy]");
+    const code = card.querySelector<HTMLTextAreaElement>("[data-export-code]")?.value ?? "";
+    const label = button?.querySelector<HTMLElement>("[data-label]");
+    const status = card.querySelector<HTMLElement>("[data-export-status]");
+    const copyIcon = button?.querySelector('[data-icon="copy"]');
+    const checkIcon = button?.querySelector('[data-icon="check"]');
+    let timer = 0;
+    button?.addEventListener("click", () => {
+      void navigator.clipboard?.writeText(code).catch(() => {});
+      if (label) label.textContent = "Copied";
+      if (status) status.textContent = "Code copied";
+      copyIcon?.classList.add("hidden");
+      checkIcon?.classList.remove("hidden");
+      window.clearTimeout(timer);
+      // Same 1.6s as the app's ExportDialog.
+      timer = window.setTimeout(() => {
+        if (label) label.textContent = "Copy code";
+        if (status) status.textContent = "";
+        copyIcon?.classList.remove("hidden");
+        checkIcon?.classList.add("hidden");
+      }, 1600);
+    });
+  });
+</script>

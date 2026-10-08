@@ -1,0 +1,71 @@
+---
+/**
+ * fountible.com's export section, ported as live markup from the fountible-site repo
+ * (src/components/home/ExportSheet.astro, wording as published): the design facts on the
+ * left, the app's own Export dialog on the right with real exporter output, then every
+ * format the same source exports to. Same components, tokens and fonts
+ * (src/styles/fountible-ui.css); the sheet frame, section header and scroll reveals stay
+ * on fountible.com.
+ */
+import Card from "./Card.astro";
+import Bezel from "./Bezel.astro";
+import ProductCard from "./ProductCard.astro";
+import SpecRows from "./SpecRows.astro";
+import TagPill from "./TagPill.astro";
+import CodeToken from "./CodeToken.astro";
+import ExportCard from "./ExportCard.astro";
+
+// The pricing card's own classes, as the exporter printed them (exportSample.ts).
+const classes = ["flex", "flex-col", "gap-6", "p-8", "w-80", "rounded-2xl"];
+
+const formats = [
+  { label: "React + Tailwind JSX", mono: false },
+  { label: "anime.js timelines", mono: false },
+  { label: "PNG", mono: true },
+  { label: "JPG", mono: true },
+  { label: "SVG", mono: true },
+  { label: "PDF · Mac app", mono: false },
+  { label: "MP4", mono: true },
+  { label: "MOV with alpha · Mac app", mono: false },
+  { label: "PPTX · decks", mono: false },
+];
+---
+
+<div class="fountible-ui">
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+    <Card tier="outlined" class="flex flex-col gap-6 p-6 sm:p-8">
+      <h3 class="text-[20px] font-semibold leading-tight tracking-[-0.01em]">One selection, one component.</h3>
+      <p class="text-body text-text-sub-600">
+        Select a frame and press <CodeToken>⌘⇧C</CodeToken>, or open Export from the header. You get JSX
+        with the classes the inspector shows.
+      </p>
+      <div class="flex flex-wrap gap-1.5">
+        {classes.map((c) => <TagPill label={c} mono variant="outline" />)}
+      </div>
+      <SpecRows
+        class="mt-auto"
+        rows={[
+          { label: "Output", value: "React + Tailwind JSX" },
+          { label: "Same as", value: "Copy as code · ⌘⇧C" },
+          { label: "Motion", value: "plain anime.js, reduced-motion aware" },
+        ]}
+      />
+    </Card>
+
+    <Bezel rim="hairline" class="min-w-0">
+      <ProductCard>
+        <ExportCard />
+      </ProductCard>
+    </Bezel>
+  </div>
+
+  <Card tier="outlined" class="mt-4 flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+    <div class="max-w-[360px]">
+      <h3 class="text-[20px] font-semibold leading-tight tracking-[-0.01em]">Every export, one source.</h3>
+      <p class="mt-2 text-body-sm text-text-sub-600">The layers you design are what each format renders.</p>
+    </div>
+    <ul class="flex flex-wrap gap-1.5 lg:max-w-[640px] lg:justify-end" aria-label="Export formats">
+      {formats.map((f) => <li><TagPill label={f.label} mono={f.mono} /></li>)}
+    </ul>
+  </Card>
+</div>

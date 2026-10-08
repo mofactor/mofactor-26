@@ -1,0 +1,20 @@
+---
+/**
+ * Recessed tray that presents ONE object. Light: a grey dip. Dark: a hole in
+ * the floor, so a product card on it reads as lifted in both themes.
+ */
+interface Props {
+  pad?: "sm" | "md" | "none";
+  /** Faint dot field (a pattern, not a glow). */
+  dotted?: boolean;
+  class?: string;
+}
+
+const { pad = "sm", dotted = false, class: className = "" } = Astro.props;
+
+const pads = { sm: "p-1.5 sm:p-2", md: "p-2 sm:p-3", none: "" }[pad];
+---
+
+<div class:list={["relative rounded-[20px] bg-bg-tray shadow-tray sm:rounded-tray", pads, dotted && "bg-dotgrid", className]}>
+  <slot />
+</div>

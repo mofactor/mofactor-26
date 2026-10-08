@@ -1,0 +1,37 @@
+---
+/** Spec rows split by dotted rules (data inside a card): a mono label, a plain-English value. */
+interface Row {
+  label: string;
+  value: string;
+  href?: string;
+}
+
+interface Props {
+  rows: Row[];
+  dense?: boolean;
+  class?: string;
+}
+
+const { rows, dense = false, class: className = "" } = Astro.props;
+---
+
+<dl class:list={["text-spec", className]}>
+  {rows.map((row, i) => (
+    <div
+      class:list={[
+        "flex items-baseline justify-between gap-6",
+        dense ? "py-2" : "py-3",
+        i < rows.length - 1 && "rule-dotted",
+      ]}
+    >
+      <dt class="shrink-0 font-mono text-text-soft-400">{row.label}</dt>
+      <dd class="text-right text-[14px] font-medium leading-5 text-text-strong-950">
+        {row.href ? (
+          <a href={row.href} class="underline decoration-line-card underline-offset-[3px] transition-colors hover:decoration-current">{row.value}</a>
+        ) : (
+          row.value
+        )}
+      </dd>
+    </div>
+  ))}
+</dl>

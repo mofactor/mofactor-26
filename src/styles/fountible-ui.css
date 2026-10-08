@@ -1,0 +1,165 @@
+/*
+ * Fountible's site design system, for showcases ported from the fountible-site repo
+ * (src/styles/global.css). Only what those components use. The values live on `.fountible-ui`
+ * and switch with the page's `.dark` (or an inner `.dark`, which ProductCard uses to keep
+ * app chrome dark on a light page). Grays are written out because this site's Tailwind
+ * gray scale isn't fountible's zinc-based one.
+ */
+
+@font-face {
+  font-family: "Duplet";
+  src: url("/fonts/duplet/Duplet-Regular.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Duplet";
+  src: url("/fonts/duplet/Duplet-Semibold.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Duplet";
+  src: url("/fonts/duplet/Duplet-Semibold.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* @fontsource-variable/manrope, latin-ext and latin subsets */
+@font-face {
+  font-family: "Manrope Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("/fonts/manrope/manrope-latin-ext-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Manrope Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("/fonts/manrope/manrope-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@theme {
+  /* The app's own chrome stack: product mocks use it, never the site fonts */
+  --font-chrome: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-chrome-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --radius-card: 1rem; /* 16 */
+  --radius-tray: 1.5rem; /* 24 */
+  --radius-sheet: 2rem; /* 32 */
+
+  --text-body: 1rem; /* 16/26 */
+  --text-body--line-height: 1.625rem;
+  --text-body-sm: 0.9375rem; /* 15/24, in-card body */
+  --text-body-sm--line-height: 1.5rem;
+  --text-spec: 0.8125rem; /* 13/20 mono, spec rows */
+  --text-spec--line-height: 1.25rem;
+  --text-spec--font-weight: 400;
+}
+
+/* Theme-switching tokens: utilities read the variables where they're used */
+@theme inline {
+  --color-text-strong-950: var(--text-strong-950);
+  --color-text-sub-600: var(--text-sub-600);
+  --color-text-soft-400: var(--text-soft-400);
+  --color-text-accent: var(--text-accent);
+  --color-primary-alpha-10: var(--primary-alpha-10);
+  --color-overlay-line: var(--overlay-line);
+  --color-line-card: var(--line-card);
+  --color-bg-rim: var(--bg-rim);
+  --color-bg-tray: var(--bg-tray);
+  --color-bg-card: var(--bg-card);
+  --color-bg-chrome: var(--bg-chrome);
+
+  --shadow-micro: var(--shadow-micro-val);
+  --shadow-rim: var(--shadow-rim-val);
+  --shadow-tray: var(--shadow-tray-val);
+  --shadow-lift: var(--shadow-lift-val);
+}
+
+.fountible-ui {
+  --text-strong-950: #09090b;
+  --text-sub-600: #52525b;
+  --text-soft-400: #6b6b73;
+  --text-accent: #b83616;
+  --primary-alpha-10: rgb(240 80 35 / 0.1);
+  --overlay-line: rgb(0 0 0 / 0.07);
+  --line-card: rgb(0 0 0 / 0.08);
+  --rule-dot: rgb(0 0 0 / 0.14);
+  --bg-rim: #ffffff;
+  --bg-tray: #f0f1f2;
+  --bg-card: #ffffff;
+  --bg-chrome: #18181b; /* app zinc-900, never flips */
+
+  --shadow-micro-val: 0 0 0 1px rgb(0 0 0 / 0.05), 0 0.5px 1px rgb(0 0 0 / 0.06),
+    0 2px 2px -1px rgb(0 0 0 / 0.04), 0 3px 3px -1.5px rgb(27 27 27 / 0.03),
+    0 4px 4px -2px rgb(0 0 0 / 0.03), 0 8px 8px -4px rgb(0 0 0 / 0.02);
+  --shadow-rim-val: var(--shadow-micro-val);
+  --shadow-tray-val: inset 0 1px 2px rgb(0 0 0 / 0.06), inset 0 0 0 1px rgb(0 0 0 / 0.04);
+  --shadow-lift-val: inset 0 0 0 1px rgb(255 255 255 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 1px 1px rgb(0 0 0 / 0.1), 0 6px 12px -4px rgb(0 0 0 / 0.16),
+    0 24px 40px -16px rgb(0 0 0 / 0.3), 0 60px 80px -40px rgb(0 0 0 / 0.22);
+
+  /* fountible's body type: Manrope at 420, medium = 540 */
+  --font-weight-medium: 540;
+  color: var(--text-strong-950);
+  font-family: "Manrope Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  font-weight: 420;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dark .fountible-ui,
+.fountible-ui .dark {
+  --text-strong-950: #ffffff;
+  --text-sub-600: #a1a1aa;
+  --text-soft-400: #8b8b94;
+  --text-accent: #f86238;
+  --primary-alpha-10: rgb(240 80 35 / 0.16);
+  --overlay-line: rgb(255 255 255 / 0.09);
+  --line-card: rgb(255 255 255 / 0.08);
+  --rule-dot: rgb(255 255 255 / 0.12);
+  --bg-rim: #18181b;
+  --bg-tray: #09090b;
+  --bg-card: #18181b;
+  --bg-chrome: #18181b;
+
+  --shadow-micro-val: inset 0 0 0 1px rgb(255 255 255 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.05),
+    0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-rim-val: inset 0 0 0 1px rgb(255 255 255 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --shadow-tray-val: inset 0 1px 2px rgb(0 0 0 / 0.6), inset 0 0 0 1px rgb(255 255 255 / 0.03);
+  --shadow-lift-val: inset 0 0 0 1px rgb(255 255 255 / 0.08), inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 2px 6px rgb(0 0 0 / 0.5), 0 24px 48px -12px rgb(0 0 0 / 0.7);
+}
+
+.fountible-ui :is(h1, h2, h3, h4, h5, h6) {
+  font-family: "Duplet", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.fountible-ui button {
+  font-weight: 540;
+}
+
+/* Dotted rule under spec rows */
+.fountible-ui .rule-dotted {
+  background-image: linear-gradient(to right, var(--rule-dot) 2px, transparent 2px);
+  background-position: 0 100%;
+  background-size: 6px 1px;
+  background-repeat: repeat-x;
+}
