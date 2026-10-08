@@ -32,7 +32,8 @@ export const works: WorkItem[] = [
     href: "/work/fountible",
     logoSrc: "/assets/logos/fountible.svg",
     logoClassName: "w-[16%]",
-    hoverSrc: "/assets/work/fountible/grid-fountible.webp",
+    videoSrc: "/works/fountible/fountible-grid.webm",
+    videoPoster: "/works/fountible/fountible-grid-poster.webp",
     darkHover: true,
   },
   {
