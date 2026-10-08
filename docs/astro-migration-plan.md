@@ -23,7 +23,8 @@ Status: direction approved 2026-10-08 · Target: Astro 7.3.x (Vite 8, Rust compi
 | Security fix | Done on production (2026-10-08): document root `httpdocs/public`, so source files return 404 |
 | 8 Staging | Done on tt6: own deploy path, `astro` branch, manual deploys; every check passed, including one real contact email |
 | 8 Go-live | **Live on monofactor.com since 2026-10-08 00:38 UTC.** Startup file `passenger.cjs`, document root `httpdocs/public`. nginx page caching turned off for the domain: it held Next's pages and would have cached blog posts for 5 days |
-| Follow-ups | Production's Plesk repo can't fetch from GitHub (its deploy key stopped working in April); until it's fixed, deploy by fetching into tt6's mirror and copying `main` across (see the go-live notes). Admin publish to be tested by you. In a week: delete `httpdocs/.next`, `tt6.monofactor.com.next-20261008` and `httpdocs-env.local.bak-20261008`. Then precise `.astro` commits (7) |
+| Auto-deploy | Pushing `main` deploys monofactor.com; pushing `astro` deploys tt6 (GitHub webhooks → Plesk Git, auto mode → `scripts/deploy.sh`). Production's Plesk fetch had silently stopped updating in April; it fetches again since 2026-10-08 (the deploy key itself was fine) |
+| Follow-ups | Admin publish to be tested by you. In a week: delete `httpdocs/.next`, `tt6.monofactor.com.next-20261008` and `httpdocs-env.local.bak-20261008`. Then precise `.astro` commits (7) |
 | Rollback | Set `ext-nodejs-startupFile` back to `.next/standalone/server.js`, run `plesk sbin httpdmng --reconfigure-domain monofactor.com`, then touch `httpdocs/tmp/restart.txt` |
 
 **What changed from the plan in practice:**
@@ -508,7 +509,7 @@ Phases 3–6 can run in any order after Phase 2. Phase 7 can trail the cutover.
 - A second Passenger app in the same subscription, with its own document root and repo (`mofactor-26.git`).
 - Its repo's deployment path was `/httpdocs`, production's folder, so it deployed `main` into production rather than into tt6. tt6's own folder was a stale copy from early April.
 
-**Deploys are manual.** The GitHub repo has no webhooks, so a push deploys nothing. Deploy with `plesk ext git --fetch` and then `--deploy` (both with `-domain … -name …`), or Plesk → Git → Pull/Deploy.
+**Deploys run on push** (since 2026-10-08): GitHub webhooks call each Plesk repo's webhook URL, and both repos are in auto mode. `main` → monofactor.com (`mofaletta-26.git`), `astro` → tt6 (`mofactor-26.git`). To deploy by hand: Plesk → Git → Pull/Deploy, or `plesk ext git --deploy -domain … -name …`.
 
 **Plesk's Node.js app root is derived, not stored.** `dom_param` holds only `ext-nodejs-startupFile`, `-handlerPath`, `-enabled` and `-environment`. The app root is the document root, minus a trailing `/public`. So the document root must be `<app root>/public`: `httpdocs/dist/client` would move the app root into `dist/client`.
 
@@ -536,7 +537,7 @@ Same server, same Plesk/Passenger/Git setup, and no new services.
 
 Tested locally: the build lands in `dist-next`, the swap keeps `dist-prev` for rollback, and `PORT=4331 node passenger.cjs` serves every route (prerendered pages, posts, 404s, `/og`, `/sitemap.xml`, `/nexus`, `/work/flux/` → 301 to `/work/flux`).
 
-**Known gap:** `npm ci` deletes and reinstalls `node_modules` (about a minute). The running server keeps what it has loaded, but an on-demand route that hasn't been loaded since the last restart can fail during that minute.
+**Known gap:** when `package-lock.json` changes, `npm ci` deletes and reinstalls `node_modules` (seconds on this server). The running server keeps what it has loaded, but an on-demand route that hasn't been loaded since the last restart can fail during that window. Deploys without dependency changes skip `npm ci`.
 
 **Check on staging:**
 - `curl -I` a `/_astro/…` file shows `Cache-Control: public, max-age=31536000, immutable`.

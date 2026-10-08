@@ -5,7 +5,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-npm ci
+# Reinstall dependencies only when the lockfile changed: npm ci deletes node_modules
+# first, and the running server may still need it
+lock_hash=$( (sha256sum package-lock.json 2>/dev/null || shasum -a 256 package-lock.json) | cut -d' ' -f1)
+if [ "$(cat node_modules/.deploy-lock-hash 2>/dev/null)" != "$lock_hash" ]; then
+  npm ci
+  echo "$lock_hash" > node_modules/.deploy-lock-hash
+fi
+
 rm -rf dist-next
 ASTRO_OUT_DIR=dist-next npm run build    # astro.config.mjs reads outDir from ASTRO_OUT_DIR
 
