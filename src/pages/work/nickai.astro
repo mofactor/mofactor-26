@@ -65,14 +65,21 @@ const seo = {
                   { label: "Period", value: "2026" },
                   { label: "Skills Utilized", value: "Product Design, Design Systems, Prototyping, Data Visualization, Web Design, AI Agents", asBadges: true },
                 ]} />
+              {/* The getnick.ai homepage and its product demo, from a screen recording (60fps), looping with a dissolve back to the start */}
               <div class="h-full w-full">
-                <Image
-                  src={img("/works/nickai/nickai-hero.jpg")}
-                  alt="The getnick.ai homepage with the NickAI app answering a question with a chart"
-                  width={1800}
-                  quality={100}
+                <video
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  width="2608"
+                  height="1622"
+                  poster="/works/nickai/nickai-hero-poster.webp"
+                  aria-label="The getnick.ai homepage, with the NickAI app building and running a trading workflow"
                   class="rounded-2xl h-full w-full object-cover max-md:aspect-[1/1] max-md:object-right border border-zinc-200 dark:border-zinc-800"
-                  densities={[1, 2]} />
+                >
+                  <source src="/works/nickai/nickai-hero.webm" type="video/webm" />
+                </video>
               </div>
             </div>
           </div>
