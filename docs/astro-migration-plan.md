@@ -21,7 +21,10 @@ Status: direction approved 2026-10-08 · Target: Astro 7.3.x (Vite 8, Rust compi
 | 8 Local QA | Done. Layout matches Next at 375/768/1440 px on all 10 pages; dark mode matches; head/SEO checked on 12 routes (only intended improvements differ); two bugs found and fixed (below) |
 | 8 Deploy files | Done and tested locally: `passenger.cjs`, `scripts/deploy.sh`. A production build served through `passenger.cjs` answers every route correctly |
 | Security fix | Done on production (2026-10-08): document root `httpdocs/public`, so source files return 404 |
-| Next | Staging on tt6 (server changes, needs your OK) → production switch (8); then precise `.astro` commits (7) |
+| 8 Staging | Done on tt6: own deploy path, `astro` branch, manual deploys; every check passed, including one real contact email |
+| 8 Go-live | **Live on monofactor.com since 2026-10-08 00:38 UTC.** Startup file `passenger.cjs`, document root `httpdocs/public`. nginx page caching turned off for the domain: it held Next's pages and would have cached blog posts for 5 days |
+| Follow-ups | Production's Plesk repo can't fetch from GitHub (its deploy key stopped working in April); until it's fixed, deploy by fetching into tt6's mirror and copying `main` across (see the go-live notes). Admin publish to be tested by you. In a week: delete `httpdocs/.next`, `tt6.monofactor.com.next-20261008` and `httpdocs-env.local.bak-20261008`. Then precise `.astro` commits (7) |
+| Rollback | Set `ext-nodejs-startupFile` back to `.next/standalone/server.js`, run `plesk sbin httpdmng --reconfigure-domain monofactor.com`, then touch `httpdocs/tmp/restart.txt` |
 
 **What changed from the plan in practice:**
 - **Images stay in `public/`.** `import.meta.glob("/public/**")` feeds `astro:assets`, which optimizes them in place, so existing URLs keep working. A build hook (`src/integrations/prune-image-originals.ts`) deletes the original copies Vite would otherwise duplicate into `_astro/`.
