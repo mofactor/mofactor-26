@@ -11,6 +11,7 @@ import IntroTextWrapper from "@/components/ui/IntroTextWrapper.astro";
 import ProjectMeta from "@/components/ui/ProjectMeta.astro";
 import WorkNavigation from "@/components/WorkNavigation.astro";
 import { Lightbox } from "@/components/ui/Lightbox";
+import LazyVideo from "@/components/ui/LazyVideo.astro";
 import { Image } from "astro:assets";
 import { img } from "@/lib/images";
 
@@ -33,6 +34,7 @@ const seo = {
     { label: "Overview", href: "#overview" },
     { label: "Prototypes", href: "#prototypes" },
     { label: "Widgets", href: "#widgets" },
+    { label: "Films", href: "#films" },
     { label: "Outcome", href: "#outcome" },
   ]} />
   <main>
@@ -152,6 +154,30 @@ const seo = {
               <Image src={img("/works/nickai/nickai-widgets.jpg")} alt="A gallery of NickAI chat widgets" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
               <Image src={img("/works/nickai/nickai-chat-widget.jpg")} alt="A price widget inside a chat with Nick" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
             </Lightbox>
+          </div>
+        </div>
+      </section>
+
+      {/* Films */}
+      <section id="films" aria-labelledby="films-title" class="pb-24 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              blink
+              topLine="Films."
+              bottomLine="Launch films, made in Fountible." />
+
+            <IntroTextWrapper>
+              <p>
+                For the launch I made a set of short films in <a href="/work/fountible" class="underline underline-offset-4">Fountible</a>, the design tool I built. Each one tells the product story in seconds: a plain-English request, and Nick building, testing, deploying and supervising the workflow behind it.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div data-nav-theme="dark" class="mt-24 flex flex-col gap-6">
+            <LazyVideo src="/works/nickai/nickai-film.webm" posterSrc="/works/nickai/nickai-film-poster.jpg" autoplay loop muted playsinline class="w-full h-auto rounded-2xl" />
+            <LazyVideo src="/works/nickai/nickai-film-2.webm" posterSrc="/works/nickai/nickai-film-2-poster.jpg" autoplay loop muted playsinline class="w-full h-auto rounded-2xl" />
           </div>
         </div>
       </section>
