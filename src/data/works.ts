@@ -5,6 +5,8 @@ export interface WorkItem {
   featured?: boolean;
   videoSrc?: string;
   videoPoster?: string;
+  /** Featured card only: a still (path under public/) when there's no video */
+  imageSrc?: string;
   logoSrc?: string;
   hoverSrc?: string;
   darkHover?: boolean;
@@ -13,12 +15,16 @@ export interface WorkItem {
 
 export const works: WorkItem[] = [
   {
-    title: "Flux",
+    title: "NickAI",
     description:
-      "Leading and transforming design for the blockchain powered compute and cloud infrastructure.",
-    href: "/work/flux",
+      "Product design for an agentic trading platform, from the design system and chat widgets to the marketing site.",
+    href: "/work/nickai",
     featured: true,
-    videoSrc: "/works/flux/introsmaller2.webm",
+    imageSrc: "/works/nickai/nickai-featured.jpg",
+    logoSrc: "/assets/logos/nickai.svg",
+    logoClassName: "w-[40%]",
+    hoverSrc: "/assets/work/nickai/grid-nickai.webp",
+    darkHover: true,
   },
   {
     title: "Fountible",
@@ -31,13 +37,12 @@ export const works: WorkItem[] = [
     darkHover: true,
   },
   {
-    title: "NickAI",
+    title: "Flux",
     description:
-      "Product design for an agentic trading platform, from the design system and chat widgets to mobile and web.",
-    href: "/work/nickai",
-    logoSrc: "/assets/logos/nickai.svg",
-    logoClassName: "w-[40%]",
-    hoverSrc: "/assets/work/nickai/grid-nickai.webp",
+      "Leading and transforming design for the blockchain powered compute and cloud infrastructure.",
+    href: "/work/flux",
+    logoSrc: "/assets/logos/flux.svg",
+    videoSrc: "/works/flux/introsmaller2.webm",
     darkHover: true,
   },
   {

@@ -1,9 +1,11 @@
 ---
 // Static port of WorkSection.tsx: hover effects are CSS (group-hover); the only JS is
 // the nav-theme hint below and the lazy video (LazyVideo.astro).
+import { Image } from "astro:assets";
 import DualLineHeading from "@/components/ui/DualLineHeading.astro";
 import LazyVideo from "@/components/ui/LazyVideo.astro";
 import { works } from "@/data/works";
+import { img } from "@/lib/images";
 
 const [featured, ...items] = works;
 const videoType = (src?: string) => (src?.endsWith(".webm") ? "video/webm" : "video/mp4");
@@ -17,21 +19,31 @@ const videoType = (src?: string) => (src?.endsWith(".webm") ? "video/webm" : "vi
   />
 
   <div class="mt-12 grid gap-4 sm:grid-cols-2 md:mt-16">
-    {/* Featured - Coder */}
-    <article data-nav-theme="dark" class="relative dark:mix-blend-none overflow-hidden rounded-2xl overflow-hidden sm:col-span-2 md:aspect-[16/9] dark:bg-black">
+    {/* Featured */}
+    <article data-nav-theme="dark" class="relative dark:mix-blend-none overflow-hidden rounded-2xl overflow-hidden sm:col-span-2 md:aspect-[16/9] bg-black">
 
-      {/* Video container */}
+      {/* Media: video, or a still */}
       <div class="relative z-10 max-md:aspect-[1/1] md:absolute md:inset-0">
         <div class="h-full w-full">
-          <video
-            autoplay
-            loop
-            muted
-            playsinline
-            class="h-full w-full object-cover"
-          >
-            <source src={featured.videoSrc} type={videoType(featured.videoSrc)} />
-          </video>
+          {featured.videoSrc ? (
+            <video
+              autoplay
+              loop
+              muted
+              playsinline
+              class="h-full w-full object-cover"
+            >
+              <source src={featured.videoSrc} type={videoType(featured.videoSrc)} />
+            </video>
+          ) : featured.imageSrc && (
+            <Image
+              src={img(featured.imageSrc)}
+              alt={featured.title}
+              widths={[800, 1400, 2000, 2800]}
+              sizes="(min-width: 1440px) 1352px, 100vw"
+              class="h-full w-full object-cover max-md:object-[72%_50%]"
+            />
+          )}
         </div>
       </div>
 

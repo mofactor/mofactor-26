@@ -16,7 +16,7 @@ import { img } from "@/lib/images";
 
 const seo = {
   title: "Product Design for NickAI",
-  description: "Designing NickAI's agentic trading platform across product, mobile and web, mostly by designing in code with AI.",
+  description: "Designing NickAI's agentic trading platform across the product and the web, mostly by designing in code with AI.",
   path: "/work/nickai",
   ogImages: [
     { url: "/works/nickai/nickai-hero.jpg", width: 1800, height: 1000 },
@@ -33,7 +33,6 @@ const seo = {
     { label: "Overview", href: "#overview" },
     { label: "Prototypes", href: "#prototypes" },
     { label: "Widgets", href: "#widgets" },
-    { label: "Mobile", href: "#mobile" },
     { label: "Outcome", href: "#outcome" },
   ]} />
   <main>
@@ -47,7 +46,7 @@ const seo = {
             </div>
             <div class="text-muted-foreground-dark dark:text-muted-foreground md:col-span-4">
               <BlinkText
-                text="Designing an agentic trading platform across product, mobile and web, mostly by designing in code with AI."
+                text="Designing an agentic trading platform across the product and the web, mostly by designing in code with AI."
                 mode="words"
                 delay={0.1}
                 timingConfig={{ fadeTime: 0.35, randomHoldMax: 0.3, blinkTimeMax: 1 }} />
@@ -93,7 +92,7 @@ const seo = {
                 NickAI is an agentic trading platform. You describe what you want to trade in plain English, and Nick, a non-custodial AI agent, turns it into a workflow that it builds, tests and runs across crypto, stocks and prediction markets.
               </p>
               <p>
-                As NickAI's designer in 2026, I worked across its surfaces: the product's design language and chat widgets, the prototypes that became the spec, a mobile concept, the getnick.ai website, and a small content engine for launch visuals.
+                As NickAI's designer in 2026, I worked across its surfaces: the product's design language and chat widgets, the prototypes that became the spec, the getnick.ai website, and a small content engine for launch visuals.
               </p>
             </IntroTextWrapper>
           </SectionHeaderWrapper>
@@ -153,30 +152,6 @@ const seo = {
               <Image src={img("/works/nickai/nickai-widgets.jpg")} alt="A gallery of NickAI chat widgets" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
               <Image src={img("/works/nickai/nickai-chat-widget.jpg")} alt="A price widget inside a chat with Nick" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
             </Lightbox>
-          </div>
-        </div>
-      </section>
-
-      {/* Mobile */}
-      <section id="mobile" aria-labelledby="mobile-title" class="pb-24 leading-relaxed">
-        <div class="container">
-          <SectionHeaderWrapper>
-            <DualLineHeading
-              className="md:min-w-[360px]"
-              blink
-              topLine="Mobile."
-              bottomLine="A first agent in a minute." />
-
-            <IntroTextWrapper>
-              <p>
-                A mobile concept for starting and watching agents on the go. Sign-up takes one tap, and a guided first run pre-fills a strategy so a new user gets from "what do you want to build today?" to a working agent without learning the builder first.
-              </p>
-            </IntroTextWrapper>
-          </SectionHeaderWrapper>
-
-          <div data-nav-theme="dark" class="mt-24 grid grid-cols-2 gap-6 md:gap-10 max-w-3xl mx-auto">
-            <Image src={img("/works/nickai/nickai-mobile-signup.jpg")} alt="NickAI mobile sign-up" width={780} class="w-full h-auto rounded-[2rem] border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
-            <Image src={img("/works/nickai/nickai-mobile-build.jpg")} alt="NickAI mobile: building a first agent with a guided tutorial" width={780} class="w-full h-auto rounded-[2rem] border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
           </div>
         </div>
       </section>
