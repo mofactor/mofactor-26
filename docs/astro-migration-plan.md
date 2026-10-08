@@ -539,6 +539,10 @@ Tested locally: the build lands in `dist-next`, the swap keeps `dist-prev` for r
 
 **Known gap:** when `package-lock.json` changes, `npm ci` deletes and reinstalls `node_modules` (seconds on this server). The running server keeps what it has loaded, but an on-demand route that hasn't been loaded since the last restart can fail during that window. Deploys without dependency changes skip `npm ci`.
 
+**Replacing a file in `public/`:** Cloudflare caches it for 4 hours under its URL, so a file replaced in place keeps serving the old copy (`cf-cache-status: HIT`). Give replaced media a new file name. Files under `/_astro/` are content-hashed and don't need this.
+
+**Video encoding:** encode site videos as VP9, `yuv420p`, limited-range BT.709 (`-color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709`), like every video in `public/`. Screen captures made from JPEG frames come out full-range BT.601. On a page that also plays a BT.709 video, Chrome's hardware decoder on macOS rejects them (`PIPELINE_ERROR_DECODE`, the poster stays up). Check on a real page, not with ffmpeg alone, which decodes them fine.
+
 **Check on staging:**
 - `curl -I` a `/_astro/…` file shows `Cache-Control: public, max-age=31536000, immutable`.
 - `/work` and `/works` return 404, not 403 or a directory listing.
