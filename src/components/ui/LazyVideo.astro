@@ -14,7 +14,7 @@ interface Props {
 }
 
 const { src, posterSrc, class: className, style, autoplay, loop, muted, playsinline } = Astro.props;
-const options: LazyVideoOptions = { src, className, style, autoplay, loop, muted, playsInline: playsinline };
+const options: LazyVideoOptions = { src, className, style, autoplay, loop, muted, playsInline: playsinline, poster: posterSrc };
 ---
 
 <div class={className} data-fx="lazy-video" data-fx-auto data-fx-options={JSON.stringify(options)}>

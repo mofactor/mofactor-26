@@ -10,7 +10,7 @@ import SectionHeaderWrapper from "@/components/ui/SectionHeaderWrapper.astro";
 import IntroTextWrapper from "@/components/ui/IntroTextWrapper.astro";
 import ProjectMeta from "@/components/ui/ProjectMeta.astro";
 import WorkNavigation from "@/components/WorkNavigation.astro";
-import { Lightbox } from "@/components/ui/Lightbox";
+import LazyVideo from "@/components/ui/LazyVideo.astro";
 import { Image } from "astro:assets";
 import { img } from "@/lib/images";
 
@@ -125,9 +125,7 @@ const seo = {
           </SectionHeaderWrapper>
 
           <div data-nav-theme="dark" class="mt-24">
-            <Lightbox client:idle images={[{ src: "/works/fountible/fountible-bros.jpg", alt: "Parallel Bro chats building a landing page on a shared canvas" }]}>
-              <Image src={img("/works/fountible/fountible-bros.jpg")} alt="Parallel Bro chats building a landing page on a shared canvas" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
-            </Lightbox>
+            <LazyVideo src="/works/fountible/fountible-bros.webm" posterSrc="/works/fountible/fountible-bros-poster.jpg" autoplay loop muted playsinline class="w-full h-auto rounded-2xl" />
           </div>
         </div>
       </section>
@@ -173,7 +171,7 @@ const seo = {
           </SectionHeaderWrapper>
 
           <div data-nav-theme="dark" class="mt-24">
-            <Image src={img("/works/fountible/fountible-motion.jpg")} alt="The motion timeline with keyframes for a launch card" width={1800} class="w-full h-auto rounded-2xl border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+            <LazyVideo src="/works/fountible/fountible-motion.webm" posterSrc="/works/fountible/fountible-motion-poster.jpg" autoplay loop muted playsinline class="w-full h-auto rounded-2xl" />
           </div>
         </div>
       </section>

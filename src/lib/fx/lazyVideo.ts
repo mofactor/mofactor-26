@@ -6,6 +6,8 @@ export interface LazyVideoOptions {
   loop?: boolean;
   muted?: boolean;
   playsInline?: boolean;
+  /** Shown until the first frame decodes; also gives the video its size early (no layout shift) */
+  poster?: string;
 }
 
 /**
@@ -28,6 +30,7 @@ export function lazyVideo(root: HTMLElement, options: LazyVideoOptions): () => v
       video.playsInline = !!options.playsInline;
       if (options.playsInline) video.setAttribute("playsinline", "");
       video.autoplay = !!options.autoplay;
+      if (options.poster) video.poster = options.poster;
 
       const source = document.createElement("source");
       source.src = options.src;
