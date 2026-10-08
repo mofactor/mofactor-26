@@ -34,7 +34,7 @@ const seo = {
     { label: "Overview", href: "#overview" },
     { label: "Prototypes", href: "#prototypes" },
     { label: "Widgets", href: "#widgets" },
-    { label: "Films", href: "#films" },
+    { label: "Film", href: "#film" },
     { label: "Outcome", href: "#outcome" },
   ]} />
   <main>
@@ -158,26 +158,25 @@ const seo = {
         </div>
       </section>
 
-      {/* Films */}
-      <section id="films" aria-labelledby="films-title" class="pb-24 leading-relaxed">
+      {/* Film */}
+      <section id="film" aria-labelledby="film-title" class="pb-24 leading-relaxed">
         <div class="container">
           <SectionHeaderWrapper>
             <DualLineHeading
               className="md:min-w-[360px]"
               blink
-              topLine="Films."
-              bottomLine="Launch films, made in Fountible." />
+              topLine="Launch film."
+              bottomLine="Made in Fountible." />
 
             <IntroTextWrapper>
               <p>
-                For the launch I made a set of short films in <a href="/work/fountible" class="underline underline-offset-4">Fountible</a>, the design tool I built. Each one tells the product story in seconds: a plain-English request, and Nick building, testing, deploying and supervising the workflow behind it.
+                For the launch I made short films in <a href="/work/fountible" class="underline underline-offset-4">Fountible</a>, the design tool I built. This one tells the product story in eleven seconds: a plain-English request, then Nick building, testing, deploying and supervising the workflow behind it.
               </p>
             </IntroTextWrapper>
           </SectionHeaderWrapper>
 
-          <div data-nav-theme="dark" class="mt-24 flex flex-col gap-6">
+          <div data-nav-theme="dark" class="mt-24">
             <LazyVideo src="/works/nickai/nickai-film.webm" posterSrc="/works/nickai/nickai-film-poster.jpg" autoplay loop muted playsinline class="w-full h-auto rounded-2xl" />
-            <LazyVideo src="/works/nickai/nickai-film-2.webm" posterSrc="/works/nickai/nickai-film-2-poster.jpg" autoplay loop muted playsinline class="w-full h-auto rounded-2xl" />
           </div>
         </div>
       </section>

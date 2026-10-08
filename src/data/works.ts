@@ -5,8 +5,6 @@ export interface WorkItem {
   featured?: boolean;
   videoSrc?: string;
   videoPoster?: string;
-  /** Featured card only: a still (path under public/) when there's no video */
-  imageSrc?: string;
   logoSrc?: string;
   hoverSrc?: string;
   darkHover?: boolean;
