@@ -1,0 +1,205 @@
+---
+import Base from "@/layouts/Base.astro";
+import Header from "@/components/Header";
+import BottomNav from "@/components/BottomNav";
+import Footer from "@/components/Footer.astro";
+import HeroHeadline from "@/components/ui/HeroHeadline.astro";
+import BlinkText from "@/components/ui/BlinkText.astro";
+import DualLineHeading from "@/components/ui/DualLineHeading.astro";
+import SectionHeaderWrapper from "@/components/ui/SectionHeaderWrapper.astro";
+import IntroTextWrapper from "@/components/ui/IntroTextWrapper.astro";
+import ProjectMeta from "@/components/ui/ProjectMeta.astro";
+import WorkNavigation from "@/components/WorkNavigation.astro";
+import { Lightbox } from "@/components/ui/Lightbox";
+import { Image } from "astro:assets";
+import { img } from "@/lib/images";
+
+const seo = {
+  title: "Designing and Building Fountible",
+  description: "Fountible is a design tool whose canvas is real React and Tailwind, so the design is the code. I designed and built it with AI coding agents.",
+  path: "/work/fountible",
+  ogImages: [
+    { url: "/works/fountible/fountible-hero.jpg", width: 1800, height: 1000 },
+    { url: "/og?title=Fountible&subtitle=Design+Tool+for+the+AI+Era", width: 1200, height: 630 },
+  ],
+  twitterImages: ["/works/fountible/fountible-hero.jpg"],
+};
+---
+
+<Base {...seo}>
+  <Header client:load />
+  <BottomNav client:load items={[
+    { label: "Intro", href: "#root" },
+    { label: "Overview", href: "#overview" },
+    { label: "Bro", href: "#bro" },
+    { label: "Export", href: "#export" },
+    { label: "Motion", href: "#motion" },
+    { label: "Outcome", href: "#outcome" },
+  ]} />
+  <main>
+    <article>
+      {/* Hero */}
+      <section id="root" aria-labelledby="root-title" class="relative py-24">
+        <div class="container relative">
+          <header class="grid grid-cols-1 md:grid-cols-12 items-end gap-10 md:gap-6 pb-20 pt-32">
+            <div class="md:col-span-8">
+              <HeroHeadline line1="Design Tool" line2="For the AI Era" blink />
+            </div>
+            <div class="text-muted-foreground-dark dark:text-muted-foreground md:col-span-4">
+              <BlinkText
+                text="Designing and building Fountible, a design tool whose canvas is real React and Tailwind, so the design is the code."
+                mode="words"
+                delay={0.1}
+                timingConfig={{ fadeTime: 0.35, randomHoldMax: 0.3, blinkTimeMax: 1 }} />
+            </div>
+          </header>
+
+          <div class="flex flex-col md:flex-row items-start justify-center">
+            <div class="relative w-full space-y-6 md:overflow-hidden">
+              <ProjectMeta
+                variant="grid"
+                className="max-w-full md:max-w-[380px] relative md:absolute md:bottom-1 md:left-6 z-10"
+                items={[
+                  { label: "Role", value: "Founder, Designer & Builder" },
+                  { label: "Period", value: "2026" },
+                  { label: "Skills Utilized", value: "Product Design, Interaction Design, Design Systems, Motion, AI Agents, React, Tailwind CSS", asBadges: true },
+                ]} />
+              <div data-nav-theme="dark" class="h-full w-full">
+                <Image
+                  src={img("/works/fountible/fountible-hero.jpg")}
+                  alt="The Fountible editor with a portfolio design on the canvas"
+                  width={1800}
+                  quality={100}
+                  class="rounded-2xl h-full w-full object-cover max-md:aspect-[1/1] max-md:object-left"
+                  densities={[1, 2]} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Overview */}
+      <section id="overview" aria-labelledby="overview-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              topLine="Overview:"
+              bottomLine="Backstory of the work."
+              blink={{ mode: "words" }} />
+
+            <IntroTextWrapper>
+              <p>
+                Design-to-code handoff is where good work drifts. Spacing, responsiveness and motion get approximated in translation, and teams lose days going back and forth. Fountible removes the translation step: its canvas renders real React components styled with Tailwind classes, so what you design is what ships.
+              </p>
+              <p>
+                I designed and built it largely on my own, starting in July 2026, working with AI coding agents. It runs on the web and as a Mac app, with a Chrome extension that captures any page into editable layers, and an MCP plugin that lets Claude Code or Cursor edit a file live.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div class="mt-20">
+            <Image src={img("/works/fountible/fountible-site.jpg")} alt="The fountible.com homepage" width={1800} class="w-full h-auto rounded-2xl border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+          </div>
+        </div>
+      </section>
+
+      {/* Bro */}
+      <section id="bro" aria-labelledby="bro-title" class="pb-24 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              blink
+              topLine="Bro."
+              bottomLine="An AI that works on the canvas." />
+
+            <IntroTextWrapper>
+              <p>
+                Bro is Fountible's canvas agent. It runs on the ChatGPT, Claude, Cursor or Kimi plan you already have, and up to six Bros can work on the same file at once, each in its own chat, with numbered cursors so you can see who is doing what. Runs that reach for the same layers wait their turn instead of colliding, and any run can be steered midway or reverted.
+              </p>
+              <p>
+                Documents are plain HTML tags, Tailwind classes and CSS variables, so agents read the real implementation instead of an approximation of it. That is what makes their edits land cleanly.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div data-nav-theme="dark" class="mt-24">
+            <Lightbox client:idle images={[{ src: "/works/fountible/fountible-bros.jpg", alt: "Parallel Bro chats building a landing page on a shared canvas" }]}>
+              <Image src={img("/works/fountible/fountible-bros.jpg")} alt="Parallel Bro chats building a landing page on a shared canvas" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
+            </Lightbox>
+          </div>
+        </div>
+      </section>
+
+      {/* Export */}
+      <section id="export" aria-labelledby="export-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              blink
+              topLine="Export."
+              bottomLine="The design is the code." />
+
+            <IntroTextWrapper>
+              <p>
+                Select a frame and copy it as React and Tailwind JSX, with exactly the classes the inspector shows. The same layers render to anime.js timelines, SVG, PNG, PDF, MP4 and PowerPoint decks, so every format comes from one source.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div class="mt-24">
+            <Image src={img("/works/fountible/fountible-export.jpg")} alt="Exporting a selected frame as React and Tailwind JSX" width={1800} class="w-full h-auto rounded-2xl border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+          </div>
+        </div>
+      </section>
+
+      {/* Motion */}
+      <section id="motion" aria-labelledby="motion-title" class="pb-24 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              blink
+              topLine="Motion."
+              bottomLine="A timeline on the same canvas." />
+
+            <IntroTextWrapper>
+              <p>
+                Motion sits on top of the same layers: presets for fades, flips and staggers, a keyframe timeline for the details, and video export with audio. What you preview is what exports, as plain anime.js.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div data-nav-theme="dark" class="mt-24">
+            <Image src={img("/works/fountible/fountible-motion.jpg")} alt="The motion timeline with keyframes for a launch card" width={1800} class="w-full h-auto rounded-2xl border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+          </div>
+        </div>
+      </section>
+
+      {/* Outcome */}
+      <section id="outcome" aria-labelledby="outcome-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="flex-1 md:min-w-[360px]"
+              topLine="The Impact."
+              bottomLine="Shipping & Outcome." />
+
+            <IntroTextWrapper>
+              <p>
+                Fountible is live on the web and as a Mac app, with the Capture extension on the Chrome Web Store and the MCP package on npm. It is free to design in, and the AI runs on the plan you already pay for.
+              </p>
+              <p>
+                Building it changed how I think about design work. AI models lowered the cost of implementation dramatically, but they did not provide the point of view: deciding what to build, how it should feel and when it was good enough stayed the job. I wrote about the process in <a href="/blog/building-fountible-with-claude-gpt-and-kimi" class="underline underline-offset-4">Building Fountible with Claude Fable 5, GPT-5.6 and Kimi K3</a>.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+        </div>
+      </section>
+    </article>
+    <WorkNavigation currentSlug="fountible" />
+  </main>
+  <Footer />
+</Base>

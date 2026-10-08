@@ -1,0 +1,208 @@
+---
+import Base from "@/layouts/Base.astro";
+import Header from "@/components/Header";
+import BottomNav from "@/components/BottomNav";
+import Footer from "@/components/Footer.astro";
+import HeroHeadline from "@/components/ui/HeroHeadline.astro";
+import BlinkText from "@/components/ui/BlinkText.astro";
+import DualLineHeading from "@/components/ui/DualLineHeading.astro";
+import SectionHeaderWrapper from "@/components/ui/SectionHeaderWrapper.astro";
+import IntroTextWrapper from "@/components/ui/IntroTextWrapper.astro";
+import ProjectMeta from "@/components/ui/ProjectMeta.astro";
+import WorkNavigation from "@/components/WorkNavigation.astro";
+import { Lightbox } from "@/components/ui/Lightbox";
+import { Image } from "astro:assets";
+import { img } from "@/lib/images";
+
+const seo = {
+  title: "Product Design for NickAI",
+  description: "Designing NickAI's agentic trading platform across product, mobile and web, mostly by designing in code with AI.",
+  path: "/work/nickai",
+  ogImages: [
+    { url: "/works/nickai/nickai-hero.jpg", width: 1800, height: 1000 },
+    { url: "/og?title=NickAI&subtitle=Product+Design", width: 1200, height: 630 },
+  ],
+  twitterImages: ["/works/nickai/nickai-hero.jpg"],
+};
+---
+
+<Base {...seo}>
+  <Header client:load />
+  <BottomNav client:load items={[
+    { label: "Intro", href: "#root" },
+    { label: "Overview", href: "#overview" },
+    { label: "Prototypes", href: "#prototypes" },
+    { label: "Widgets", href: "#widgets" },
+    { label: "Mobile", href: "#mobile" },
+    { label: "Outcome", href: "#outcome" },
+  ]} />
+  <main>
+    <article>
+      {/* Hero */}
+      <section id="root" aria-labelledby="root-title" class="relative py-24">
+        <div class="container relative">
+          <header class="grid grid-cols-1 md:grid-cols-12 items-end gap-10 md:gap-6 pb-20 pt-32">
+            <div class="md:col-span-8">
+              <HeroHeadline line1="Agentic Trading" line2="For NickAI" blink />
+            </div>
+            <div class="text-muted-foreground-dark dark:text-muted-foreground md:col-span-4">
+              <BlinkText
+                text="Designing an agentic trading platform across product, mobile and web, mostly by designing in code with AI."
+                mode="words"
+                delay={0.1}
+                timingConfig={{ fadeTime: 0.35, randomHoldMax: 0.3, blinkTimeMax: 1 }} />
+            </div>
+          </header>
+
+          <div class="flex flex-col md:flex-row items-start justify-center">
+            <div class="relative w-full space-y-6 md:overflow-hidden">
+              <ProjectMeta
+                variant="grid"
+                className="max-w-full md:max-w-[380px] relative md:absolute md:bottom-1 md:left-6 z-10"
+                items={[
+                  { label: "Role", value: "Product Designer" },
+                  { label: "Period", value: "2026" },
+                  { label: "Skills Utilized", value: "Product Design, Design Systems, Prototyping, Data Visualization, Web Design, AI Agents", asBadges: true },
+                ]} />
+              <div class="h-full w-full">
+                <Image
+                  src={img("/works/nickai/nickai-hero.jpg")}
+                  alt="The getnick.ai homepage with the NickAI app answering a question with a chart"
+                  width={1800}
+                  quality={100}
+                  class="rounded-2xl h-full w-full object-cover max-md:aspect-[1/1] max-md:object-right border border-zinc-200 dark:border-zinc-800"
+                  densities={[1, 2]} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Overview */}
+      <section id="overview" aria-labelledby="overview-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              topLine="Overview:"
+              bottomLine="Backstory of the work."
+              blink={{ mode: "words" }} />
+
+            <IntroTextWrapper>
+              <p>
+                NickAI is an agentic trading platform. You describe what you want to trade in plain English, and Nick, a non-custodial AI agent, turns it into a workflow that it builds, tests and runs across crypto, stocks and prediction markets.
+              </p>
+              <p>
+                As NickAI's designer in 2026, I worked across its surfaces: the product's design language and chat widgets, the prototypes that became the spec, a mobile concept, the getnick.ai website, and a small content engine for launch visuals.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+        </div>
+      </section>
+
+      {/* Prototypes */}
+      <section id="prototypes" aria-labelledby="prototypes-title" class="pb-24 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              blink
+              topLine="Prototypes."
+              bottomLine="Designing in code." />
+
+            <IntroTextWrapper>
+              <p>
+                Instead of handing over static mockups, I built working prototypes in code: chat beside a live workflow, its structure, scheduled runs and execution history, all in one frame. Engineering then ported the prototype's design system straight into the product, with its tokens, components, typography, icon set and floating-panel app frame.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div data-nav-theme="dark" class="mt-24">
+            <Lightbox client:idle images={[{ src: "/works/nickai/nickai-workflow.jpg", alt: "Prototype of a multi-LLM consensus workflow beside the chat with Nick" }]}>
+              <Image src={img("/works/nickai/nickai-workflow.jpg")} alt="Prototype of a multi-LLM consensus workflow beside the chat with Nick" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
+            </Lightbox>
+          </div>
+        </div>
+      </section>
+
+      {/* Widgets */}
+      <section id="widgets" aria-labelledby="widgets-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              blink
+              topLine="Widgets."
+              bottomLine="Ask a question, get a chart back." />
+
+            <IntroTextWrapper>
+              <p>
+                Nick answers with widgets: prices, comparisons, market sentiment, prediction markets and order receipts. They are frozen snapshots of what the agent actually fetched, with the source and the time it was read, rather than UI generated on the fly. Asking again adds a fresh answer instead of quietly changing the old one.
+              </p>
+              <p>
+                Small details make them read at a glance: a tray holding an inner card, tabular numerals and a split-gradient Fear & Greed meter. Every trade goes through a single approval card.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div data-nav-theme="dark" class="mt-24 flex flex-col gap-6">
+            <Lightbox client:idle images={[
+              { src: "/works/nickai/nickai-widgets.jpg", alt: "A gallery of NickAI chat widgets" },
+              { src: "/works/nickai/nickai-chat-widget.jpg", alt: "A price widget inside a chat with Nick" },
+            ]}>
+              <Image src={img("/works/nickai/nickai-widgets.jpg")} alt="A gallery of NickAI chat widgets" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
+              <Image src={img("/works/nickai/nickai-chat-widget.jpg")} alt="A price widget inside a chat with Nick" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
+            </Lightbox>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile */}
+      <section id="mobile" aria-labelledby="mobile-title" class="pb-24 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              blink
+              topLine="Mobile."
+              bottomLine="A first agent in a minute." />
+
+            <IntroTextWrapper>
+              <p>
+                A mobile concept for starting and watching agents on the go. Sign-up takes one tap, and a guided first run pre-fills a strategy so a new user gets from "what do you want to build today?" to a working agent without learning the builder first.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div data-nav-theme="dark" class="mt-24 grid grid-cols-2 gap-6 md:gap-10 max-w-3xl mx-auto">
+            <Image src={img("/works/nickai/nickai-mobile-signup.jpg")} alt="NickAI mobile sign-up" width={780} class="w-full h-auto rounded-[2rem] border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+            <Image src={img("/works/nickai/nickai-mobile-build.jpg")} alt="NickAI mobile: building a first agent with a guided tutorial" width={780} class="w-full h-auto rounded-[2rem] border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+          </div>
+        </div>
+      </section>
+
+      {/* Outcome */}
+      <section id="outcome" aria-labelledby="outcome-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="flex-1 md:min-w-[360px]"
+              topLine="The Impact."
+              bottomLine="Shipping & Outcome." />
+
+            <IntroTextWrapper>
+              <p>
+                The design system and the widget designs shipped into the production app, and the same widgets now fill the "Ask a question. Get a chart back." section of getnick.ai, the marketing site I created.
+              </p>
+              <p>
+                Working this way collapsed the distance between design and engineering. The spec was a working prototype, built with AI coding agents, that engineering could read, run and port instead of interpreting.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+        </div>
+      </section>
+    </article>
+    <WorkNavigation currentSlug="nickai" />
+  </main>
+  <Footer />
+</Base>

@@ -1,0 +1,209 @@
+---
+import Base from "@/layouts/Base.astro";
+import Header from "@/components/Header";
+import BottomNav from "@/components/BottomNav";
+import Footer from "@/components/Footer.astro";
+import HeroHeadline from "@/components/ui/HeroHeadline.astro";
+import BlinkText from "@/components/ui/BlinkText.astro";
+import DualLineHeading from "@/components/ui/DualLineHeading.astro";
+import SectionHeaderWrapper from "@/components/ui/SectionHeaderWrapper.astro";
+import IntroTextWrapper from "@/components/ui/IntroTextWrapper.astro";
+import ProjectMeta from "@/components/ui/ProjectMeta.astro";
+import WorkNavigation from "@/components/WorkNavigation.astro";
+import { Lightbox } from "@/components/ui/Lightbox";
+import { Image } from "astro:assets";
+import { img } from "@/lib/images";
+
+const seo = {
+  title: "Website Design for GBO Vision",
+  description: "A bilingual site for an Istanbul enterprise AI company, with a live particle face that talks back.",
+  path: "/work/gbo-vision",
+  ogImages: [
+    { url: "/works/gbo-vision/gbo-hero.jpg", width: 1800, height: 1000 },
+    { url: "/og?title=GBO+Vision&subtitle=Website+Design", width: 1200, height: 630 },
+  ],
+  twitterImages: ["/works/gbo-vision/gbo-hero.jpg"],
+};
+---
+
+<Base {...seo}>
+  <Header client:load />
+  <BottomNav client:load items={[
+    { label: "Intro", href: "#root" },
+    { label: "Overview", href: "#overview" },
+    { label: "Face", href: "#face" },
+    { label: "Demos", href: "#demos" },
+    { label: "System", href: "#system" },
+    { label: "Outcome", href: "#outcome" },
+  ]} />
+  <main>
+    <article>
+      {/* Hero */}
+      <section id="root" aria-labelledby="root-title" class="relative py-24">
+        <div class="container relative">
+          <header class="grid grid-cols-1 md:grid-cols-12 items-end gap-10 md:gap-6 pb-20 pt-32">
+            <div class="md:col-span-8">
+              <HeroHeadline line1="Website Design" line2="For GBO Vision" blink />
+            </div>
+            <div class="text-muted-foreground-dark dark:text-muted-foreground md:col-span-4">
+              <BlinkText
+                text="Designing and building a bilingual site for an enterprise AI company, with a hero that talks back."
+                mode="words"
+                delay={0.1}
+                timingConfig={{ fadeTime: 0.35, randomHoldMax: 0.3, blinkTimeMax: 1 }} />
+            </div>
+          </header>
+
+          <div class="flex flex-col md:flex-row items-start justify-center">
+            <div class="relative w-full space-y-6 md:overflow-hidden">
+              <ProjectMeta
+                variant="grid"
+                className="max-w-full md:max-w-[380px] relative md:absolute md:bottom-1 md:left-6 z-10"
+                items={[
+                  { label: "Role", value: "Design & Development" },
+                  { label: "Period", value: "2026" },
+                  { label: "Skills Utilized", value: "Web Design, Creative Coding, three.js, Astro, Localization, AI Agents", asBadges: true },
+                ]} />
+              <div class="h-full w-full">
+                <Image
+                  src={img("/works/gbo-vision/gbo-hero.jpg")}
+                  alt="The GBO Vision homepage with its particle face"
+                  width={1800}
+                  quality={100}
+                  class="rounded-2xl h-full w-full object-cover max-md:aspect-[1/1] max-md:object-right border border-zinc-200 dark:border-zinc-800"
+                  densities={[1, 2]} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Overview */}
+      <section id="overview" aria-labelledby="overview-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              topLine="Overview:"
+              bottomLine="Backstory of the work."
+              blink={{ mode: "words" }} />
+
+            <IntroTextWrapper>
+              <p>
+                GBO Vision is an Istanbul company that builds AI products and custom software for law firms, banks, valuation firms and clinics: <a href="/work/kollektor" class="underline underline-offset-4">Kollektor</a> for collection calls, <a href="/work/hastam" class="underline underline-offset-4">Hastam</a> for clinic phone lines, Intelval for property valuation reports, and <a href="/work/fountible" class="underline underline-offset-4">Fountible</a>.
+              </p>
+              <p>
+                The site had to explain very different products in one place, earn the trust of careful Turkish enterprises, rank in Turkish search and bring in demo requests. I designed and built it in Astro, in Turkish and English.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+        </div>
+      </section>
+
+      {/* Face */}
+      <section id="face" aria-labelledby="face-title" class="pb-24 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              blink
+              topLine="The Face."
+              bottomLine="A hero that talks back." />
+
+            <IntroTextWrapper>
+              <p>
+                Instead of a stock illustration, the hero is a live particle face built with three.js. It follows your cursor, or the tilt of your phone, and when you call the AI assistant from the page it lip-syncs to the voice, in Turkish or English.
+              </p>
+              <p>
+                Getting it right took around twenty logged checkpoints. My bar was simple: never a robotic or fish-like mouth, and nothing that felt uncanny. Even the call button moved, from a disc on the face, which read like a horror film, to a pill below it. The unglamorous part mattered too: an iOS crash mid-call was fixed, and style recalculations during playback went from about 120 every two seconds to zero.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div data-nav-theme="dark" class="mt-24">
+            <Image src={img("/works/gbo-vision/gbo-hero-dark.jpg")} alt="The particle face in the dark theme" width={1800} class="w-full h-auto rounded-2xl" densities={[1, 2]} />
+            <p class="mt-3 text-sm text-zinc-500">The face is built on a 3D head sculpt by Rodesqa (CC BY 4.0).</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Demos */}
+      <section id="demos" aria-labelledby="demos-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              blink
+              topLine="Demos."
+              bottomLine="Show the call, not the claim." />
+
+            <IntroTextWrapper>
+              <p>
+                Each product gets an animated sample call: the caller's phone on one side and the operator's live view on the other, with the transcript, the checks the AI runs and the result as it lands. The calls are translated from Turkish and clearly marked as sample data.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div class="mt-24 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Lightbox client:idle images={[
+              { src: "/works/gbo-vision/gbo-demo-hastam.jpg", alt: "Sample Hastam call booking a clinic appointment" },
+              { src: "/works/gbo-vision/gbo-demo-kollektor.jpg", alt: "Sample Kollektor call agreeing a payment plan" },
+            ]}>
+              <Image src={img("/works/gbo-vision/gbo-demo-hastam.jpg")} alt="Sample Hastam call booking a clinic appointment" width={1800} class="w-full h-auto rounded-2xl border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+              <Image src={img("/works/gbo-vision/gbo-demo-kollektor.jpg")} alt="Sample Kollektor call agreeing a payment plan" width={1800} class="w-full h-auto rounded-2xl border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+            </Lightbox>
+          </div>
+        </div>
+      </section>
+
+      {/* System */}
+      <section id="system" aria-labelledby="system-title" class="pb-24 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="md:min-w-[360px]"
+              blink
+              topLine="System."
+              bottomLine="Figures, colour & language." />
+
+            <IntroTextWrapper>
+              <p>
+                A set of isometric figures explains how the work gets done without stock imagery, and colour carries meaning: green when the system is running, amber when it is waiting on a person. Amber replaced a tomato red that read as a failure.
+              </p>
+              <p>
+                Turkish lives at the root and English under /en, driven by one route table for canonical links, language alternates and the sitemap. The blog stays Turkish-only, because thin English copies would hurt more than help.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+
+          <div class="mt-24">
+            <Image src={img("/works/gbo-vision/gbo-figures.jpg")} alt="Isometric figures explaining GBO Vision's process" width={1800} class="w-full h-auto rounded-2xl border border-zinc-200 dark:border-zinc-800" densities={[1, 2]} />
+          </div>
+        </div>
+      </section>
+
+      {/* Outcome */}
+      <section id="outcome" aria-labelledby="outcome-title" class="pb-24 bg-white dark:bg-zinc-950 leading-relaxed">
+        <div class="container">
+          <SectionHeaderWrapper>
+            <DualLineHeading
+              className="flex-1 md:min-w-[360px]"
+              topLine="The Impact."
+              bottomLine="Shipping & Outcome." />
+
+            <IntroTextWrapper>
+              <p>
+                The site is live in both languages at gbovision.com, and the face shipped in September 2026.
+              </p>
+              <p>
+                It was also an exercise in directing AI. Agents drafted the Turkish copy guide, the contact-page research and the lip-sync spec, while the taste calls stayed with me: which version of the face, which colour, which words.
+              </p>
+            </IntroTextWrapper>
+          </SectionHeaderWrapper>
+        </div>
+      </section>
+    </article>
+    <WorkNavigation currentSlug="gbo-vision" />
+  </main>
+  <Footer />
+</Base>

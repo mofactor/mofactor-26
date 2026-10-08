@@ -21,6 +21,56 @@ export const works: WorkItem[] = [
     videoSrc: "/works/flux/introsmaller2.webm",
   },
   {
+    title: "Fountible",
+    description:
+      "Designing and building a design tool whose canvas is real React and Tailwind, so the design is the code.",
+    href: "/work/fountible",
+    logoSrc: "/assets/logos/fountible.svg",
+    logoClassName: "w-[16%]",
+    hoverSrc: "/assets/work/fountible/grid-fountible.webp",
+    darkHover: true,
+  },
+  {
+    title: "NickAI",
+    description:
+      "Product design for an agentic trading platform, from the design system and chat widgets to mobile and web.",
+    href: "/work/nickai",
+    logoSrc: "/assets/logos/nickai.svg",
+    logoClassName: "w-[40%]",
+    hoverSrc: "/assets/work/nickai/grid-nickai.webp",
+    darkHover: true,
+  },
+  {
+    title: "GBO Vision",
+    description:
+      "A bilingual site for an enterprise AI company, with a live particle face that talks back.",
+    href: "/work/gbo-vision",
+    logoSrc: "/assets/logos/gbo-vision.svg",
+    logoClassName: "w-[40%]",
+    hoverSrc: "/assets/work/gbo-vision/grid-gbo.webp",
+    darkHover: true,
+  },
+  {
+    title: "Hastam",
+    description:
+      "Product and web design for an AI receptionist that answers the phone for clinics.",
+    href: "/work/hastam",
+    logoSrc: "/assets/logos/hastam.svg",
+    logoClassName: "w-[40%]",
+    hoverSrc: "/assets/work/hastam/grid-hastam.webp",
+    darkHover: true,
+  },
+  {
+    title: "Kollektor",
+    description:
+      "Voice AI design for a phone agent that calls in Turkish for collection teams, firm in tone and under the operator's control.",
+    href: "/work/kollektor",
+    logoSrc: "/assets/logos/kollektor.svg",
+    logoClassName: "w-[16%]",
+    hoverSrc: "/assets/work/kollektor/grid-kollektor.webp",
+    darkHover: true,
+  },
+  {
     title: "Airbit",
     description:
       "End-to-end design for the world's leading marketplace for beats, enabling creators to sell music globally.",

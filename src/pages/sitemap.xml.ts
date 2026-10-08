@@ -11,6 +11,11 @@ const SITE = "https://monofactor.com";
 const staticRoutes: { path: string; priority: number }[] = [
   { path: "", priority: 1 },
   { path: "/work/flux", priority: 0.8 },
+  { path: "/work/fountible", priority: 0.8 },
+  { path: "/work/nickai", priority: 0.8 },
+  { path: "/work/gbo-vision", priority: 0.8 },
+  { path: "/work/hastam", priority: 0.8 },
+  { path: "/work/kollektor", priority: 0.8 },
   { path: "/work/solitonic", priority: 0.8 },
   { path: "/work/airbit", priority: 0.8 },
   { path: "/work/postlight", priority: 0.8 },
